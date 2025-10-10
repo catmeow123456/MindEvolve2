@@ -1,0 +1,12 @@
+task_name: "dictator_game"
+
+llm:
+  model: "deepseek-v3-250324"
+  max_tokens: 16384
+  timeout: 6000
+
+evolution_setting:
+  max_iterations: 6
+  program_pool_size: 2
+
+evaluation_timeout: 12000   # 完整的单次评估的最大时间

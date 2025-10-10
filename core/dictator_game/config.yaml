@@ -1,0 +1,47 @@
+name: "dictator_game"
+plugin_name: "DictatorGamePlugin"
+
+data_files: # 名称: 相对于 main 的文件路径
+  behavioral_data: "PNAS2018_fMRI_behavioral_model_data.csv"
+  prompt_review: "prompt_review.txt"
+
+program_template: "program_template.py"
+
+evaluation_config:  # 自定义的 evaluation 配置格式
+  reviewer_llm:
+    model: "deepseek-v3-250324"
+    max_tokens: 16384
+    timeout: 6000
+
+mission_description: |
+  ## 🎮 Overall Experimental Task Flow
+
+  The core task in this study is an interactive paradigm that combines a "Dot Estimation Task + Dictator Game (DG)" to manipulate social contexts (e.g., "guilt") and measure individual responses to inequality.  
+  Each round of the experiment consists of two stages:
+
+  ### 1. Dot Estimation Task Stage
+  - Each trial began by informing the participant that the program had randomly chosen one out of the three Player Bs as his/her co-player in the current trial, the identity of whom was unknown (1 ~ 4 seconds). 
+  - In half of the trials the participant had to quickly estimate the number of dots on the screen within 2.8 seconds (Self trials) and in other half of the trials he/she needed to wait for his/her co-player to make the estimation, which lasted for 2.8 seconds (Other trials). If the answer was correct, no one would receive pain stimulation, and the game continued to the next trial. The presentation of correct outcomes lasted for 2 seconds. If anyone's answer was incorrect, the co-player in the current trial had a 50% chance of receiving the pain stimulation, which was randomly decided by the program (Pain trials and Nopain trials). The presentation of incorrect outcomes lasted for 4 seconds.
+
+  There were four possible conditions for the estimation-incorrect trials, forming a 2 (Agent who performed dot-estimation task: Self vs. Other) by 2 (Outcome for the co-player: Pain vs. Nopain) within-subject design: the participant estimated incorrectly and the co-player received pain stimulation (Self_Pain), the participant estimated incorrectly and the co-player did not receive pain stimulation (Self_Nopain), the co-player estimated incorrectly and the co-player received pain stimulation (Other_Pain), the co-player estimated incorrectly and the co-player did not receive pain stimulation (Other_Nopain).
+
+  ---
+
+  ### 2. Dictator Game Stage
+  - After each round of the dot estimation task, the participant would act as a Dictator and make monetary binary choices (i.e., the binary version of DG) to determine the payoffs for him/herself and the co-player. One option was always "10 points for me, and 10 points for the co-player" (i.e., the equal option) and the other option was an unequal option. The participants needed to make each choice within 4 seconds. The DG gave the participant a chance to compensate for the co-player in this trial. The participant was told that the co-player did not know the existence of DG and could not see the DG choices during the experiment.
+
+  ---
+
+  ## 🧮 Computational Modeling Objective:
+
+  Each participant completes multiple rounds under four different conditions:
+
+  0: Self_Pain  
+  1: Self_NoPain  
+  2: Other_Pain  
+  3: Other_NoPain  
+
+  You are required to build a model that fits participants' choices under these different conditions.  
+  You may propose psychological parameters to better capture participants' decision-making and underlying psychological mechanisms.
+
+  Please define your model's parameter configuration and core prediction function.
