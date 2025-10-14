@@ -1,0 +1,15 @@
+task_name: "trust_game"
+
+llm:
+  model: "deepseek-v3-250324"
+  timeout: 6000
+
+evolution_setting:
+  max_iterations: 6
+  program_pool_size: 2
+
+cache:
+  enabled: true
+  cache_dir: "__cache__"
+
+evaluation_timeout: 12000   # 完整的单次评估的最大时间

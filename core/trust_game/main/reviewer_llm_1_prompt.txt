@@ -1,0 +1,140 @@
+## 🎮 Overall Experimental Task: Trust Game
+
+Participants engaged in a 10-round interactive multi-round trust game, where they played the role of the "Investor". In each round:
+- The investor received an initial endowment of 20 tokens
+- The investor decided how much to transfer to the trustee (0, 5, 10, 15, or 20 tokens)
+- The investment was tripled by the experimenter before reaching the trustee
+- The trustee decided how many tokens to return to the investor
+- At the end of each round, participants saw the amount returned by the trustee
+
+Note: The trustee's behavior was simulated by a computer algorithm (unknown to participants).
+
+---
+
+## 🧮 Computational Modeling Objective:
+
+The goal is to model the investor's behavior across 10 rounds, considering multiple psychological and strategic factors:
+
+**Available Parameters:**
+- `inequalityAversion`: Social preference regarding outcome inequality
+- `riskAversion`: Economic preference for risk
+- `theoryOfMindSophistication`: Level of recursive perspective-taking about trustee's behavior
+- `planning`: Forward-looking planning depth
+- `irritability`: Sensitivity to negative outcomes (e.g., low returns)
+- `irritationAwareness`: Awareness of one's own irritation effects
+- `inverseTemperature`: Decision randomness/determinism
+
+**State Information:**
+- `round`: Current round number (0-9)
+- `history`: List of tuples [(investor_action, trustee_action)] from previous rounds
+
+---
+
+## 📊 Model to Review:
+
+```python
+{model}
+```
+
+---
+
+## 🔍 Evaluation Task:
+
+Please conduct a comprehensive theoretical evaluation of this computational model from the perspective of cognitive science and behavioral economics. Your evaluation should focus on **theoretical interpretability and mechanistic accuracy** rather than statistical fit alone.
+
+### Evaluation Dimensions:
+
+#### 1. **Payoff Calculation** (Yes / Partially / No)
+- Does the model correctly specify the trust game's basic payoff structure?
+- Are the economic outcomes (investor's final payoff) computed accurately?
+- Is the tripling mechanism and return structure properly represented?
+
+#### 2. **Subjective Utility - Economic Preference** (Yes / Partially / No)
+- Is risk aversion appropriately modeled using established utility functions (e.g., power utility, exponential utility)?
+- Does the model capture uncertainty about trustee's return behavior?
+- Are expected utilities computed in a theoretically sound manner?
+
+#### 3. **Subjective Utility - Social Preference** (Yes / Partially / No)
+- Is inequality aversion formalized using recognized frameworks (e.g., Fehr-Schmidt model, Bolton-Ockenfels ERC)?
+- Does the model distinguish between advantageous and disadvantageous inequality?
+- Is irritation/anger toward low trustee returns modeled as a psychologically meaningful mechanism (not just as a simple additive term)?
+- Are emotional responses (e.g., irritation) integrated in a theoretically coherent way?
+
+#### 4. **Theory of Mind (ToM)** (Yes / Partially / No)
+**Critical Assessment Points:**
+- ⚠️ **Common Flaw**: Does the model merely estimate the trustee's return rate from historical data (e.g., simple averaging)? If so, this is **conceptually insufficient**.
+- ✓ **Correct Approach**: Does the model implement recursive perspective-taking where:
+  - The investor models the trustee's beliefs about the investor's strategy?
+  - The trustee's behavior is predicted based on the trustee's own utility maximization?
+  - There are multiple levels of strategic reasoning (level-0, level-1, level-2, etc.)?
+- Does the ToM implementation capture the interdependency of beliefs in strategic interactions?
+
+#### 5. **Planning** (Yes / Partially / No)
+**Critical Assessment Points:**
+- ⚠️ **Common Flaw**: Is planning implemented as a simple additive term or scaling factor? If so, this is **conceptually inaccurate**.
+- ✓ **Correct Approach**: Does the model use recursive/dynamic planning methods such as:
+  - Bellman equations for multi-step lookahead?
+  - Value iteration or backward induction?
+  - Explicit modeling of future states and expected future utilities?
+- Does the planning depth parameter meaningfully affect the decision process through proper recursion?
+
+#### 6. **Overall Code Interpretability** (0-100 scale)
+- Are psychological constructs clearly defined and implemented?
+- Is the model architecture transparent and followable?
+- Are parameter meanings aligned with their cognitive/economic interpretations?
+- Does the model avoid unnecessary complexity while capturing essential mechanisms?
+
+---
+
+## 📝 Output Format:
+
+**IMPORTANT**: Please follow this EXACT format for score reporting to ensure proper parsing:
+
+```
+### Dimension Scores:
+1. Payoff Calculation: [Yes/Partially/No]
+   - Brief justification (1-2 sentences)
+
+2. Subjective Utility - Economic Preference: [Yes/Partially/No]
+   - Brief justification (1-2 sentences)
+
+3. Subjective Utility - Social Preference: [Yes/Partially/No]
+   - Brief justification (1-2 sentences)
+
+4. Theory of Mind: [Yes/Partially/No]
+   - Brief justification (1-2 sentences)
+   - Does it avoid the "simple historical averaging" flaw? [Yes/No]
+   - Does it implement recursive perspective-taking? [Yes/No]
+
+5. Planning: [Yes/Partially/No]
+   - Brief justification (1-2 sentences)
+   - Does it avoid the "simple additive term" flaw? [Yes/No]
+   - Does it use recursive/dynamic methods? [Yes/No]
+
+6. Overall Interpretability Score: [XX]
+   - Brief justification (1-2 sentences)
+   - **NOTE**: Replace XX with a number from 0 to 100
+
+### Strengths:
+- [List 2-3 key strengths]
+
+### Weaknesses:
+- [List 2-3 key weaknesses or areas for improvement]
+
+### Overall Assessment:
+[2-3 sentences summarizing the model's theoretical quality and suitability for cognitive modeling]
+```
+
+**CRITICAL**: 
+- For items 1-5, you MUST use exactly one of: [Yes], [Partially], or [No]
+- For item 6 (Overall Interpretability Score), you MUST provide a number in the format: [XX] where XX is between 0 and 100
+- Do not use additional brackets or parentheses around scores
+
+---
+
+## ⚠️ Important Notes:
+
+1. **Prioritize theoretical soundness over statistical fit**: A model with perfect BIC may still be mechanistically implausible.
+2. **Be especially critical of oversimplifications**: Simple additive terms for complex constructs like planning or irritation are red flags.
+3. **Theory of Mind is typically the hardest**: Most models fail here by treating it as simple pattern recognition rather than recursive reasoning.
+4. **Alignment with cognitive science principles**: The model should reflect established theories (e.g., prospect theory for risk, Bellman equations for planning, level-k reasoning for ToM).

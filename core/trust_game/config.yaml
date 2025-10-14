@@ -1,0 +1,26 @@
+name: "trust_game"
+plugin_name: "TrustGamePlugin"
+
+data_files: # 名称: 相对于 main 的文件路径
+  game_data: "BaseNSPNTrust.csv"
+  prompt_review_1: "reviewer_llm_1_prompt.txt"
+  prompt_review_2: "reviewer_llm_2_prompt.txt"
+
+program_template:
+  "program_template.py"
+
+evaluation_config: # 自定义的 evaluation 配置格式
+  reviewer_llm:
+    model: "claude-sonnet-4-5-20250929"
+    max_tokens: 10000
+    timeout: 6000
+    thinking_enabled: true
+    thinking_budget_tokens: 6000
+
+mission_description: |
+  To evaluate trust behavior, participants engaged in a 10-round interactive multi-round trust game, where they played the role of the "Investor". In each round, the investor received an initial endowment of 20 tokens and then decided how much of this endowment to transfer to another person (the trustee; unbeknownst to the participants, the trustee's behavior was simulated by a computer algorithm). Participants were informed that their investment would be tripled by the experimenter before reaching the trustee. The trustee then decided how many tokens to return to the investor. At the end of each round, participants saw the amount returned by the trustee.
+  In the experimental data, the investor's behavior may take on values of 0, 1, 2, ..., 20. However, the computational modeling only considers values of 0, 5, 10, 15, and 20. Specifically, the investor's investment amount i is mapped to ((i+2) // 5 * 5).
+
+  I hope you can complete the policy function below to model the investor's behavior. 
+  Your final code must be located between "```python" and "```", and should start with "def policy(user_parameter: UserParameter, state: State) -> List[float]:".
+  To prevent exponential explosion, please subtract max(utilities) from utility in the final softmax formula.

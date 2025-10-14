@@ -18,7 +18,8 @@ class Program:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def update_metrics(self, metrics: dict[str, float]) -> None:
-        assert 'runs_successfully' in metrics
+        if 'runs_successfully' not in metrics:
+            raise ValueError(f"Metrics {metrics} do not have `runs_successfully` key")
         self.metrics = metrics.copy()
         if 'combined_score' not in self.metrics:
             self.metrics['combined_score'] = Program.calc_combined_score(self.metrics)

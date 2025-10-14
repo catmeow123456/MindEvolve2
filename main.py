@@ -1,8 +1,8 @@
 import os
 import argparse
+import importlib
 from dotenv import load_dotenv
 from core.base.config import TaskConfig
-from core.dictator_game.plugin import DictatorGamePlugin
 from evolution.config import CoreConfig
 from evolution.main import EvolutionEngine
 
@@ -35,9 +35,12 @@ def main():
     print(f"加载任务配置: {args.task_config}")
     task_config = TaskConfig.from_yaml(args.task_config)
     
-    # 创建任务插件
+    # 动态导入插件类
     print(f"初始化任务插件: {task_config.name}")
-    task_plugin = DictatorGamePlugin(task_config, args.task_path)
+    module_path = f"core.{task_config.name}.plugin"
+    module = importlib.import_module(module_path)
+    PluginClass = getattr(module, task_config.plugin_name)
+    task_plugin = PluginClass(task_config, args.task_path)
     
     # 创建进化引擎
     print("初始化进化引擎...")

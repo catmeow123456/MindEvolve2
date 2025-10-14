@@ -1,0 +1,165 @@
+## 🎮 Overall Experimental Task: Trust Game
+
+Participants engaged in a 10-round interactive multi-round trust game, where they played the role of the "Investor". In each round:
+- The investor received an initial endowment of 20 tokens
+- The investor decided how much to transfer to the trustee (0, 5, 10, 15, or 20 tokens)
+- The investment was tripled by the experimenter before reaching the trustee
+- The trustee decided how many tokens to return to the investor
+- At the end of each round, participants saw the amount returned by the trustee
+
+Note: The trustee's behavior was simulated by a computer algorithm (unknown to participants).
+
+---
+
+## 🧮 Computational Modeling Objective:
+
+The goal is to model the investor's behavior across 10 rounds. The model must implement a `policy` function that returns a probability distribution over 5 possible actions: [p(invest 0), p(invest 5), p(invest 10), p(invest 15), p(invest 20)].
+
+**Available Parameters:**
+- `inequalityAversion`: Social preference regarding outcome inequality
+- `riskAversion`: Economic preference for risk
+- `theoryOfMindSophistication`: Level of recursive perspective-taking
+- `planning`: Forward-looking planning depth
+- `irritability`: Sensitivity to negative outcomes
+- `irritationAwareness`: Awareness of one's own irritation
+- `inverseTemperature`: Decision randomness/determinism
+
+**State Information:**
+- `round`: Current round number (0-9)
+- `history`: List of tuples [(investor_action, trustee_action)]
+
+---
+
+## 📊 Code to Review:
+
+```python
+{model}
+```
+
+---
+
+## 🔍 Code Quality Evaluation Task:
+
+Please conduct a comprehensive code quality evaluation focusing on implementation clarity, correctness, and best practices. This evaluation complements the theoretical assessment by examining the technical execution of the model.
+
+### Evaluation Dimensions:
+
+#### 1. **Code Clarity and Readability** (0-100 scale)
+- Are variable names descriptive and meaningful?
+- Is the code structure logical and easy to follow?
+- Are complex operations broken down into understandable steps?
+- Is there appropriate use of comments to explain non-obvious logic?
+- Does the code follow Python conventions and style guidelines?
+
+#### 2. **Correctness and Robustness** (0-100 scale)
+- Are there any obvious logical errors or bugs?
+- Does the function handle edge cases properly (e.g., first round with no history)?
+- Are array indices and dimensions handled correctly?
+- Is division by zero or other numerical instabilities addressed?
+- Does the output always sum to 1.0 (valid probability distribution)?
+- Are all 5 action probabilities returned in the correct order?
+
+#### 3. **Computational Efficiency** (0-100 scale)
+- Is the implementation reasonably efficient for the task?
+- Are there unnecessary redundant calculations?
+- Are loops and operations vectorized where appropriate?
+- Does the code avoid exponential time complexity where possible?
+- Are there any performance bottlenecks?
+
+#### 4. **Code Organization and Modularity** (0-100 scale)
+- Is the code well-structured with clear logical sections?
+- Are helper functions used appropriately to break down complex operations?
+- Is there appropriate separation of concerns?
+- Would the code be easy to modify or extend?
+- Does the structure facilitate understanding of the model's logic?
+
+#### 5. **Best Practices Compliance** (0-100 scale)
+- Are numpy operations used correctly and efficiently?
+- Is there proper handling of floating-point arithmetic (e.g., softmax stability)?
+- Are magic numbers avoided (or clearly documented)?
+- Is the code defensive against invalid inputs?
+- Does the implementation follow the specified requirements (e.g., subtracting max from utilities in softmax)?
+
+#### 6. **Documentation Quality** (0-100 scale)
+- Are the computational steps documented?
+- Are key assumptions or design choices explained?
+- Would another developer understand the implementation without additional context?
+- Are complex formulas or algorithms referenced or explained?
+
+---
+
+## 📝 Output Format:
+
+**IMPORTANT**: Please follow this EXACT format for score reporting to ensure proper parsing:
+
+```
+### Code Quality Scores:
+
+1. Code Clarity and Readability: [XX]
+   - Brief assessment (2-3 sentences)
+   - Specific examples of good/poor practices
+
+2. Correctness and Robustness: [XX]
+   - Brief assessment (2-3 sentences)
+   - Any bugs or edge cases identified
+   - Output validation status
+
+3. Computational Efficiency: [XX]
+   - Brief assessment (2-3 sentences)
+   - Any performance concerns or optimizations suggested
+
+4. Code Organization and Modularity: [XX]
+   - Brief assessment (2-3 sentences)
+   - Structure evaluation
+
+5. Best Practices Compliance: [XX]
+   - Brief assessment (2-3 sentences)
+   - Specific practices followed or violated
+
+6. Documentation Quality: [XX]
+   - Brief assessment (2-3 sentences)
+   - Comment quality and completeness
+
+### Overall Code Quality Score: [XX]
+(Weighted average or holistic assessment)
+
+### Strengths:
+- [List 2-4 key strengths in implementation]
+
+### Areas for Improvement:
+- [List 2-4 specific suggestions for improvement]
+
+### Critical Issues (if any):
+- [List any bugs, logical errors, or serious problems]
+
+### Code Style and Conventions:
+- Python style compliance: [Good/Acceptable/Needs Improvement]
+- Naming conventions: [Good/Acceptable/Needs Improvement]
+- Comment quality: [Good/Acceptable/Needs Improvement]
+
+### Overall Code Assessment:
+[2-3 sentences summarizing the implementation quality, maintainability, and suitability for computational modeling research]
+```
+
+**CRITICAL**: 
+- For items 1-6 and Overall Code Quality Score, you MUST provide scores in the format: [XX] where XX is a number between 0 and 100
+- Do not use ranges like [0-100] or [80-90] - use a single specific number like [85]
+- Do not use additional brackets or parentheses around scores
+
+---
+
+## ⚠️ Important Evaluation Guidelines:
+
+1. **Focus on Implementation, Not Theory**: This review assesses how well the code is written, not the theoretical validity of the approach (that's covered in the theoretical review).
+
+2. **Be Constructive**: Identify both strengths and weaknesses, providing specific examples and actionable suggestions.
+
+3. **Prioritize Correctness**: Bugs and logical errors should significantly impact the score.
+
+4. **Consider Context**: This code will be used in research and may be reviewed by others. Clarity and correctness are paramount.
+
+5. **Check Outputs**: Verify that the function returns exactly 5 probabilities that sum to 1.0.
+
+6. **Numerical Stability**: Pay attention to operations that could cause numerical issues (overflow, underflow, division by zero).
+
+7. **Required Specification**: The implementation must follow the softmax formula requirement: subtract max(utilities) from utilities before applying softmax to prevent exponential explosion.
