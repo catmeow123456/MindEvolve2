@@ -25,6 +25,7 @@ class CoreConfig:
     evolution_setting: EvolutionSettingConfig = field(default_factory=EvolutionSettingConfig)
     cache: CacheConfig = field(default_factory=CacheConfig)
     evaluation_timeout: int = 1000
+    seed: Optional[int] = None
 
     @classmethod
     def from_yaml(cls, path: Union[str, Path]):

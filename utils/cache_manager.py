@@ -44,6 +44,8 @@ class SimpleCacheManager:
         """Get cached response if exists"""
         cache_key = self._generate_cache_key(**kwargs)
         response = self.cache_data.get(cache_key)
+        if response is not None:
+            print(f"Cache Hit for {cache_key}")
         return response
 
     def cache_response(self, response: str, **kwargs):

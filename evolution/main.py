@@ -1,6 +1,7 @@
 import os
 import re
 import asyncio
+import random
 from typing import Tuple, Optional
 from concurrent.futures import ThreadPoolExecutor
 from core.base import TaskPlugin, TaskEvaluator
@@ -26,6 +27,10 @@ class EvolutionEngine:
         self.evaluator = task_plugin.create_evaluator()
         self.llm = AsyncOpenAILLM(core_config.llm, os.getenv("OPENAI_BASE_URL"), os.getenv("OPENAI_API_KEY"))
 
+        # 初始化随机种子
+        if core_config.seed is not None:
+            random.seed(core_config.seed)
+
         # 初始化缓存
         if core_config.cache.enabled:
             self.llm_cache = SimpleCacheManager(core_config.cache, core_config.task_name + '.llm')
@@ -44,7 +49,8 @@ class EvolutionEngine:
             key_path = "~/.ssh/id_rsa",
             port = 22,
             request_port = self.evaluator_server_port,
-            cache = self.evaluator_cache
+            cache = self.evaluator_cache,
+            evaluation_config = self.task_plugin.get_evaluation_config()
         )
 
     def create_generation(self, program_library: ProgramLibrary, generation: int, task_dir: str, evaluator_client: RemoteEvaluatorServerManager):

@@ -16,6 +16,7 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
     available_ips: Optional[list[str]] = None
     request_port: int
     cache: Optional[SimpleCacheManager]
+    evaluation_config: dict[str, any]
     _occupied_ips: set[str]
     _lock: threading.Lock
 
@@ -28,7 +29,8 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         port: int = 22,
         request_port: int = 9000,
         timeout: int = 10,
-        cache: Optional[SimpleCacheManager] = None
+        cache: Optional[SimpleCacheManager] = None,
+        evaluation_config: Optional[dict[str, any]] = None
     ):
         super().__init__(ip_pool, key_path, port, timeout)
         self.session_id = str(uuid.uuid4())
@@ -36,6 +38,7 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         self.target_dir = os.path.join(output_dir, self.session_id)
         self.request_port = request_port
         self.cache = cache
+        self.evaluation_config = evaluation_config or {}
         self._occupied_ips = set()
         self._lock = threading.Lock()
 
@@ -191,7 +194,7 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
     def send_evaluate_request(self, ip: str, code: str, port: int, timeout: int = 30) -> Dict[str, Any]:
         """发送代码评估请求"""
         if self.cache is not None:
-            cache_params = {"code": code}
+            cache_params = {"code": code, **self.evaluation_config}
             cached_response = self.cache.get_cached_response(**cache_params)
             if cached_response:
                 return json.loads(cached_response)

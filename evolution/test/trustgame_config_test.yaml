@@ -5,7 +5,7 @@ llm:
   timeout: 6000
 
 evolution_setting:
-  max_iterations: 6
+  max_iterations: 4
   program_pool_size: 2
 
 cache:
@@ -13,3 +13,4 @@ cache:
   cache_dir: "__cache__"
 
 evaluation_timeout: 12000   # 完整的单次评估的最大时间
+seed: 12345

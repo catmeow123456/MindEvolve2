@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python Debugger: Direct main.py (without uv)",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.py",
+            "args": [
+                "--config",
+                "evolution/test/trustgame_config_test.yaml",
+                "--task-config",
+                "core/trust_game/config.yaml",
+                "--task-path",
+                "core/trust_game/",
+                "--output-dir",
+                "output/trust_game_2th"
+            ],
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "HOSTNAME_LIST": "${env:CRANE_JOB_NODELIST}"
+            },
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

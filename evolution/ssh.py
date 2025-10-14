@@ -49,7 +49,7 @@ class SSHConnectionManager:
                 print(f"跳过无法连接的主机 {ip}: {e}")
                 failed_connections.append(ip)
         if not self.connections:
-            raise RuntimeError("所有主机连接失败")
+            raise RuntimeError(f"所有主机连接失败：{self.ip_pool}")
         if failed_connections:
             print(f"以下主机连接失败：{failed_connections}")
 

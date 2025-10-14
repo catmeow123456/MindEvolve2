@@ -15,7 +15,7 @@ evaluation_config: # 自定义的 evaluation 配置格式
     max_tokens: 10000
     timeout: 6000
     thinking_enabled: true
-    thinking_budget_tokens: 6000
+    thinking_budget_tokens: 1024
 
 mission_description: |
   To evaluate trust behavior, participants engaged in a 10-round interactive multi-round trust game, where they played the role of the "Investor". In each round, the investor received an initial endowment of 20 tokens and then decided how much of this endowment to transfer to another person (the trustee; unbeknownst to the participants, the trustee's behavior was simulated by a computer algorithm). Participants were informed that their investment would be tripled by the experimenter before reaching the trustee. The trustee then decided how many tokens to return to the investor. At the end of each round, participants saw the amount returned by the trustee.

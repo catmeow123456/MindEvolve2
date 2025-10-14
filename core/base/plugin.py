@@ -21,7 +21,7 @@ class TaskPlugin(ABC):
         for name in self.config.data_files:
             data_file_path = os.path.join(task_path, "main", self.config.data_files[name])
             if not os.path.exists(data_file_path):
-                raise ValueError(f"File `{self.config.data_files[name]}` not found in directory {self.config.task_path}")
+                raise ValueError(f"File `{self.config.data_files[name]}` not found in directory {task_path}")
             self.config.data_files[name] = data_file_path
             
         program_template_path = os.path.join(task_path, "main", self.config.program_template)
