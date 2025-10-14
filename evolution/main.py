@@ -1,13 +1,14 @@
 import os
 import re
 import asyncio
-from typing import Tuple
+from typing import Tuple, Optional
 from concurrent.futures import ThreadPoolExecutor
 from core.base import TaskPlugin, TaskEvaluator
 from evolution.config import CoreConfig
 from api import AsyncOpenAILLM, OpenAIConfig
 from evolution.program_library import ProgramLibrary, Program
 from evolution.client import RemoteEvaluatorServerManager
+from utils.cache_manager import SimpleCacheManager
 
 class EvolutionEngine:
     core_config: CoreConfig
@@ -16,11 +17,22 @@ class EvolutionEngine:
     llm: AsyncOpenAILLM
     client: RemoteEvaluatorServerManager
 
+    llm_cache: Optional[SimpleCacheManager]
+    evaluator_cache: Optional[SimpleCacheManager]
+
     def __init__(self, task_plugin: TaskPlugin, core_config: CoreConfig):
         self.core_config = core_config
         self.task_plugin = task_plugin
         self.evaluator = task_plugin.create_evaluator()
         self.llm = AsyncOpenAILLM(core_config.llm, os.getenv("OPENAI_BASE_URL"), os.getenv("OPENAI_API_KEY"))
+
+        # 初始化缓存
+        if core_config.cache.enabled:
+            self.llm_cache = SimpleCacheManager(core_config.cache, core_config.task_name + '.llm')
+            self.evaluator_cache = SimpleCacheManager(core_config.cache, core_config.task_name + '.evaluator')
+        else:
+            self.llm_cache = None
+            self.evaluator_cache = None
 
         hostname_list = os.environ.get('HOSTNAME_LIST', '')
         ip_pool = [ip.strip() for ip in hostname_list.split(';') if ip.strip()]
@@ -31,7 +43,8 @@ class EvolutionEngine:
             ip_pool = ip_pool,
             key_path = "~/.ssh/id_rsa",
             port = 22,
-            request_port = self.evaluator_server_port
+            request_port = self.evaluator_server_port,
+            cache = self.evaluator_cache
         )
 
     def create_generation(self, program_library: ProgramLibrary, generation: int, task_dir: str, evaluator_client: RemoteEvaluatorServerManager):
@@ -123,9 +136,20 @@ class EvolutionEngine:
 
         return lib
 
-    async def gen_program(self, prompt: str, extra_cache_param = None) -> str:
+    async def gen_program(self, prompt: str, extra_cache_param: Optional[int] = None) -> str:
+        if self.llm_cache is not None:
+            cache_params = { "llm.config": self.llm.config.to_json(), "prompt": prompt }
+            if extra_cache_param is not None:
+                cache_params["extra_cache_param"] = extra_cache_param
+            cached_response = self.llm_cache.get_cached_response(**cache_params)
+            if cached_response:
+                return cached_response
+
         program_code = await self.llm.generate(prompt)
         program_code = self.extract_code(program_code)
+
+        if self.llm_cache:
+            self.llm_cache.cache_response(response=program_code, **cache_params)
         return program_code
 
     def extract_code(self, text: str) -> str:

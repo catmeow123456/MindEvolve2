@@ -13,3 +13,6 @@ wheels/
 .env
 output/
 tmp/
+
+# Cache Files
+__cache__

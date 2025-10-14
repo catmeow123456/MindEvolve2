@@ -1,5 +1,6 @@
 import paramiko
 from pathlib import Path
+from typing import Optional
 
 class SSHConnectionManager:
     def __init__(self, ip_pool: list[str], key_path: str = "~/.ssh/id_rsa", port: int = 22, timeout: int = 10):
@@ -102,7 +103,7 @@ class SSHConnectionManager:
             )
             print(f"成功连接到 {ip}")
             return client
-        except paramiko.AuthenticationException:
+        except paramiko.AuthenticationException as e:
             print(f"连接 {ip} 认证失败")
             raise e
         except Exception as e:

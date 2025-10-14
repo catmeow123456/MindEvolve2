@@ -2,6 +2,7 @@ import os
 from typing import Tuple
 import pandas as pd
 import numpy as np
+import warnings
 from scipy.optimize import minimize
 from pandas import DataFrame
 from api import OpenAILLM, OpenAIConfig

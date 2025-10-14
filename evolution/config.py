@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from api import OpenAIConfig
 from core.base import TaskEvaluator
 from pathlib import Path
-from typing import Union
+from typing import Union, Optional
 import yaml
 from dacite import from_dict, Config
 
@@ -13,11 +13,17 @@ class EvolutionSettingConfig:
     program_pool_size: int = 10
 
 @dataclass
+class CacheConfig:
+    enabled: bool = False
+    cache_dir: Optional[str] = None
+
+@dataclass
 class CoreConfig:
     output_dir: str = "output"
     task_name: str = "default"
     llm: OpenAIConfig = field(default_factory=OpenAIConfig)
     evolution_setting: EvolutionSettingConfig = field(default_factory=EvolutionSettingConfig)
+    cache: CacheConfig = field(default_factory=CacheConfig)
     evaluation_timeout: int = 1000
 
     @classmethod

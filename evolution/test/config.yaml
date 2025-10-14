@@ -9,4 +9,8 @@ evolution_setting:    # 进化算法迭代的参数设置
   max_iterations: 100
   program_pool_size: 20
 
+cache:
+  enabled: true
+  cache_dir: "__cache__"
+
 evaluation_timeout: 12000   # 完整的单次评估的最大时间

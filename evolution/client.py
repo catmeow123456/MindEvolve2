@@ -5,7 +5,9 @@ import os
 import threading
 import time
 import requests
+import json
 from .ssh import SSHConnectionManager
+from utils.cache_manager import SimpleCacheManager
 
 class RemoteEvaluatorServerManager(SSHConnectionManager):
     session_id: str
@@ -13,6 +15,7 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
     target_dir: str
     available_ips: Optional[list[str]] = None
     request_port: int
+    cache: Optional[SimpleCacheManager]
     _occupied_ips: set[str]
     _lock: threading.Lock
 
@@ -25,12 +28,14 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         port: int = 22,
         request_port: int = 9000,
         timeout: int = 10,
+        cache: Optional[SimpleCacheManager] = None
     ):
         super().__init__(ip_pool, key_path, port, timeout)
         self.session_id = str(uuid.uuid4())
         self.source_dir = source_dir
         self.target_dir = os.path.join(output_dir, self.session_id)
         self.request_port = request_port
+        self.cache = cache
         self._occupied_ips = set()
         self._lock = threading.Lock()
 
@@ -46,7 +51,7 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         shutil.copy2(".env", os.path.join(self.target_dir, ".env"))
 
         command1 = f"cd {os.path.abspath(self.target_dir)} && uv sync"
-        results: dict[str, Tuple] = self.execute_on_all(command1)
+        results: dict[str, tuple] = self.execute_on_all(command1)
         print(f"Command `{command1}` result:")
         for ip, (stdout, stderr, exit_code) in results.items():
             print(f"{ip}: exit_code={exit_code}")
@@ -185,6 +190,11 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
 
     def send_evaluate_request(self, ip: str, code: str, port: int, timeout: int = 30) -> Dict[str, Any]:
         """发送代码评估请求"""
+        if self.cache is not None:
+            cache_params = {"code": code}
+            cached_response = self.cache.get_cached_response(**cache_params)
+            if cached_response:
+                return json.loads(cached_response)
         result, response = self._make_request(
             'post', 
             f"http://{ip}:{port}/evaluate",
@@ -199,6 +209,8 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
             result['metadata'] = data.get('metadata')
         elif response:
             result['error'] = f"状态码 {response.status_code}：{response.text}"
+        if self.cache is not None:
+            self.cache.cache_response(response=json.dumps(result), **cache_params)
         return result
 
     def send_shutdown_request(self, ip: str, port: int, timeout: int = 5) -> Dict[str, Any]:
