@@ -5,6 +5,7 @@ import csv
 import multiprocessing
 
 
+# DO NOT MODIFY: UserParameter class definition (required for BIC calculation and model evaluation)
 class UserParameter:
     inequalityAversion: float  # {0, 0.4, 1}
     riskAversion: float  # {0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8}
@@ -33,6 +34,7 @@ class UserParameter:
         self.inverseTemperature = inverseTemperature
 
 
+# DO NOT MODIFY: State class definition (required for game dynamics and model evaluation)
 class State:
     round: int  # round = len(history)
     history: List[Tuple[int, int]]  # [(investor's action), (trustee's action)]

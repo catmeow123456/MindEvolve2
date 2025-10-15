@@ -8,6 +8,7 @@ from .utils import get_time, sha256_hash
 from .reviewers import ModelReviewers
 from .score_extractors import extract_scores_from_theoretical_review, extract_scores_from_code_review
 from .model_tester import test_model_runs_successfully
+from .bic_calculator import calculate_bic_score
 
 
 class TrustGameEvaluator(TaskEvaluator):
@@ -79,12 +80,27 @@ class TrustGameEvaluator(TaskEvaluator):
             )
             print(f"模型运行成功率: {runs_successfully_score:.2%}")
             
+            # Calculate BIC score only if model runs successfully
+            if runs_successfully_score > 0:
+                print("计算 BIC 分数...")
+                bic_score, bic_metadata = calculate_bic_score(
+                    model_code,
+                    self.game_data,
+                    self.config
+                )
+                print(f"BIC 分数: {bic_score:.4f}")
+            else:
+                print("模型运行失败，跳过 BIC 计算")
+                bic_score = 0.0
+                bic_metadata = {"skipped": "runs_successfully is False or 0"}
+            
             # Combine metrics
             metrics = {
                 "reviewer_1_overall": reviewer_1_scores.get("overall", 0.0),
                 "reviewer_2_overall": reviewer_2_scores.get("overall", 0.0),
                 "combined_score": (reviewer_1_scores.get("overall", 0.0) + reviewer_2_scores.get("overall", 0.0)) / 2.0,
-                "runs_successfully": runs_successfully_score
+                "runs_successfully": runs_successfully_score,
+                "bic_score": bic_score
             }
             
             # Store full comments in metadata
@@ -94,6 +110,7 @@ class TrustGameEvaluator(TaskEvaluator):
                 "reviewer_1_scores": reviewer_1_scores,
                 "reviewer_2_scores": reviewer_2_scores,
                 "runs_successfully_metadata": runs_metadata,
+                "bic_metadata": bic_metadata,
                 "saved_files": {
                     "code": code_path,
                     "review_1": review_1_path,
@@ -114,9 +131,10 @@ class TrustGameEvaluator(TaskEvaluator):
                 "reviewer_1_overall": 0.0,
                 "reviewer_2_overall": 0.0,
                 "combined_score": 0.0,
-                "runs_successfully": 0.0
+                "runs_successfully": 0.0,
+                "bic_score": 0.0
             }, metadata
 
     def get_metric_names(self) -> list[str]:
         """Return list of metric names provided by this evaluator"""
-        return ['reviewer_1_overall', 'reviewer_2_overall', 'combined_score', 'runs_successfully']
+        return ['reviewer_1_overall', 'reviewer_2_overall', 'combined_score', 'runs_successfully', 'bic_score']
