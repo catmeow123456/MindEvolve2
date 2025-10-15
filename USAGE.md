@@ -1,33 +1,41 @@
 # MindEvolve v2 使用指南
 
 ## 快速启动
+以 dictator game 的计算建模任务为例, 运行本框架
 
-### 1. 配置环境变量
+### 1. 准备环境
+提示：框架支持分布式运行来提高性能，此时需要通过鹤思或Slurm调度器来在超算环境中运行。
+
+配置免密登录
+```bash
+mkdir -p ~/.ssh
+
+# 如果服务器没有生成过密钥, 需要生成
+ssh-keygen
+
+# 配置免密
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+```
 
 创建 `.env` 文件，添加必要的环境变量：
-
 ```bash
-# API 配置
-OPENAI_API_KEY=your_api_key_here
-OPENAI_BASE_URL=https://api.your-provider.com/v1
-
-# 远程评估服务器（可选，使用分号分隔多个 IP）
-HOSTNAME_LIST=192.168.1.100;192.168.1.101;192.168.1.102
+cp .env.template .env
+vi .env
 ```
 
-### 2. 基本运行
-
-使用默认配置运行：
-
+安装依赖
 ```bash
-python main.py
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
+
+### 2. 编写任务的配置、提示词与评估代码
+框架提供了dictator game的所有配置、提示词与评估代码，位于 core/dictator_game , 如需执行其他任务，请复制 core/dictator_game 目录并自行修改。
 
 ### 3. 自定义参数
-
+由于框架迭代运行时间长，建议在 tmux 中运行，避免程序运行中断
 ```bash
-python main.py \
-  --config evolution/test/config.yaml \
+uv run main.py \
+  --config evolution/test/trustgame_config_test.yaml \
   --task-config core/dictator_game/config.yaml \
   --task-path core/dictator_game \
   --output-dir output

@@ -1,13 +1,14 @@
 name: "dictator_game"
-plugin_name: "DictatorGamePlugin"
+plugin_name: "DictatorGamePlugin"  # 定义在plugin.py中的类名
 
-data_files: # 名称: 相对于 main 的文件路径
+data_files: # 所需数据文件, 位于 main 目录下的文件路径
   behavioral_data: "PNAS2018_fMRI_behavioral_model_data.csv"
   prompt_review: "prompt_review.txt"
 
+# 程序模板, 位于 main 目录下的文件路径
 program_template: "program_template.py"
 
-evaluation_config:  # 自定义的 evaluation 配置格式
+evaluation_config:  # 自定义的 evaluation 配置格式, 以下的"reviewer_llm"名称也是自定义, 并在 evaluator.py 中读取
   reviewer_llm:
     model: "deepseek-v3-250324"
     max_tokens: 16384
