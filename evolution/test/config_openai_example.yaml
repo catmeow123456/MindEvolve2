@@ -1,0 +1,21 @@
+task_name: "example_openai"
+
+llm:
+  provider: "openai"  # 指定使用 OpenAI
+  model: "o3-2025-04-16"
+  temperature: 0.7
+  max_tokens: 4096
+  reasoning_effort: "high"  # OpenAI o-series 模型特有参数
+  timeout: 60
+  retries: 3
+  retry_delay: 5
+
+evolution_setting:
+  max_iterations: 100
+  program_pool_size: 20
+
+cache:
+  enabled: true
+  cache_dir: "__cache__"
+
+evaluation_timeout: 12000

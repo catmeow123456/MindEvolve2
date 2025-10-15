@@ -13,7 +13,7 @@ def get_time() -> str:
 @dataclass
 class OpenAIConfig:
     model: str
-    temperature: Optional[str] = None
+    temperature: Optional[float] = None
     top_p: Optional[float] = None
     max_tokens: int = 4096
     reasoning_effort: Optional[Literal["minimal", "low", "medium", "high"]] = None  # For OpenAI o-series models

@@ -36,9 +36,15 @@ def test_litellm_openai():
 def test_litellm_anthropic():
     """Test LiteLLM with Anthropic model (Claude)"""
     config = LiteLLMConfig(
-        model="claude-3-5-sonnet-20241022",
-        temperature=0.7,
-        max_tokens=100
+        model="claude-sonnet-4-5-20250929",
+        temperature=1,
+        max_tokens=2048,
+        extra_params={
+            "thinking": {
+                "type": "enabled",
+                "budget_tokens": 1024
+            }
+        }
     )
     
     llm = LiteLLM(

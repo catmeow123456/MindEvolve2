@@ -1,6 +1,7 @@
 task_name: "dictator_game"
 
 llm:
+  provider: "openai"  # 默认使用 OpenAI 接口
   model: "deepseek-v3-250324"
   max_tokens: 16384
   timeout: 6000

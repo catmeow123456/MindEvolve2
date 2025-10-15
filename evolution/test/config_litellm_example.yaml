@@ -1,0 +1,22 @@
+task_name: "example_litellm"
+
+llm:
+  provider: "litellm"  # 指定使用 LiteLLM（统一接口，支持多个提供商）
+  model: "gemini/gemini-2.5-flash"  # 可以是任何 LiteLLM 支持的模型
+  temperature: 0.7
+  max_tokens: 4096
+  timeout: 60
+  retries: 3
+  retry_delay: 5
+  # extra_params:  # 可选：传递给 LiteLLM 的额外参数
+  #   custom_param: "value"
+
+evolution_setting:
+  max_iterations: 100
+  program_pool_size: 20
+
+cache:
+  enabled: true
+  cache_dir: "__cache__"
+
+evaluation_timeout: 12000

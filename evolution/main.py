@@ -6,7 +6,12 @@ from typing import Tuple, Optional
 from concurrent.futures import ThreadPoolExecutor
 from core.base import TaskPlugin, TaskEvaluator
 from evolution.config import CoreConfig
-from api import AsyncOpenAILLM, OpenAIConfig
+from api import (
+    LLMInterface,
+    AsyncOpenAILLM, OpenAIConfig,
+    AsyncAnthropicLLM, AnthropicConfig,
+    AsyncLiteLLM, LiteLLMConfig
+)
 from evolution.program_library import ProgramLibrary, Program
 from evolution.client import RemoteEvaluatorServerManager
 from utils.cache_manager import SimpleCacheManager
@@ -15,7 +20,7 @@ class EvolutionEngine:
     core_config: CoreConfig
     task_plugin: TaskPlugin
     evaluator: TaskEvaluator
-    llm: AsyncOpenAILLM
+    llm: LLMInterface
     client: RemoteEvaluatorServerManager
 
     llm_cache: Optional[SimpleCacheManager]
@@ -25,7 +30,28 @@ class EvolutionEngine:
         self.core_config = core_config
         self.task_plugin = task_plugin
         self.evaluator = task_plugin.create_evaluator()
-        self.llm = AsyncOpenAILLM(core_config.llm, os.getenv("OPENAI_BASE_URL"), os.getenv("OPENAI_API_KEY"))
+        
+        # 根据配置类型创建对应的 LLM 实例
+        if isinstance(core_config.llm, OpenAIConfig):
+            self.llm = AsyncOpenAILLM(
+                core_config.llm,
+                os.getenv("OPENAI_BASE_URL"),
+                os.getenv("OPENAI_API_KEY")
+            )
+        elif isinstance(core_config.llm, AnthropicConfig):
+            self.llm = AsyncAnthropicLLM(
+                core_config.llm,
+                os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com"),
+                os.getenv("ANTHROPIC_API_KEY")
+            )
+        elif isinstance(core_config.llm, LiteLLMConfig):
+            self.llm = AsyncLiteLLM(
+                core_config.llm,
+                os.getenv("OPENAI_BASE_URL"),  # LiteLLM 可以使用自定义 base_url
+                os.getenv("OPENAI_API_KEY")     # 或从环境变量中读取
+            )
+        else:
+            raise ValueError(f"Unsupported LLM config type: {type(core_config.llm)}")
 
         # 初始化随机种子
         if core_config.seed is not None:

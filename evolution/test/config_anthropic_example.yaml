@@ -1,0 +1,22 @@
+task_name: "example_anthropic"
+
+llm:
+  provider: "anthropic"  # 指定使用 Anthropic
+  model: "claude-sonnet-4-5-20250929"
+  temperature: 1
+  max_tokens: 4096
+  thinking_enabled: true  # Anthropic 特有：启用扩展思考
+  thinking_budget_tokens: 1024  # Anthropic 特有：思考令牌预算
+  timeout: 60
+  retries: 3
+  retry_delay: 5
+
+evolution_setting:
+  max_iterations: 100
+  program_pool_size: 20
+
+cache:
+  enabled: true
+  cache_dir: "__cache__"
+
+evaluation_timeout: 12000
