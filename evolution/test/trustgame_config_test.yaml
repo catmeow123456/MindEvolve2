@@ -1,7 +1,9 @@
 task_name: "trust_game"
 
 llm:
-  model: "deepseek-v3-250324"
+  provider: "litellm"
+  model: "gemini/gemini-2.5-flash"
+  max_tokens: 10000
   timeout: 6000
 
 evolution_setting:

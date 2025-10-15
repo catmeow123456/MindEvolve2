@@ -176,7 +176,7 @@ class AsyncLiteLLM(LLMInterface):
         """
         message_list = [{"role": "user", "content": prompt}]
         response = await self._generate(messages=message_list, **kwargs)
-        print(response)
+        # DEBUG: print(response)
         # Extract content from response
         if hasattr(response, 'choices') and len(response.choices) > 0:
             message = response.choices[0].message

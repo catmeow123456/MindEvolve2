@@ -29,16 +29,16 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ### 2. 编写任务的配置、提示词与评估代码
-框架提供了dictator game的所有配置、提示词与评估代码，位于 core/dictator_game , 如需执行其他任务，请复制 core/dictator_game 目录并自行修改。
+框架提供了 dictator game 的所有配置、提示词与评估代码，位于 core/dictator_game , 如需执行其他任务，请复制 core/dictator_game 目录并自行修改。
 
 ### 3. 自定义参数
 由于框架迭代运行时间长，建议在 tmux 中运行，避免程序运行中断
 ```bash
 uv run main.py \
-  --config evolution/test/trustgame_config_test.yaml \
+  --config evolution/test/dictatorgame_config_test.yaml \
   --task-config core/dictator_game/config.yaml \
   --task-path core/dictator_game \
-  --output-dir output
+  --output-dir output/dictator_game
 ```
 
 ## 命令行参数说明

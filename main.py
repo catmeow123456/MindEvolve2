@@ -1,5 +1,6 @@
 import os
 import argparse
+import asyncio
 import importlib
 from dotenv import load_dotenv
 from core.base.config import TaskConfig
@@ -60,10 +61,10 @@ def main():
     print(f"{'=' * 60}\n")
     
     try:
-        library = engine.run_evolution(
+        library = asyncio.run(engine.run_evolution(
             task_dir=args.task_path,
             save_dir=args.output_dir
-        )
+        ))
         
         print(f"\n{'=' * 60}")
         print("进化算法完成!")
