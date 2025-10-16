@@ -27,11 +27,11 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         ip_pool: list[str],
         key_path: str = "~/.ssh/id_rsa",
         port: int = 22,
-        timeout: int = 10,
+        timeout_sec: int = 10,
         cache: Optional[SimpleCacheManager] = None,
         evaluation_config: Optional[dict[str, any]] = None
     ):
-        super().__init__(ip_pool, key_path, port, timeout)
+        super().__init__(ip_pool, key_path, port, timeout_sec)
         self.session_id = str(uuid.uuid4())
         self.source_dir = source_dir
         self.target_dir = os.path.join(output_dir, self.session_id)
@@ -238,13 +238,13 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
             
         return result
 
-    def wait_for_result(self, output_file: str, timeout: int, poll_interval: float = 1.0) -> Dict[str, Any]:
+    def wait_for_result(self, output_file: str, timeout_sec: int, poll_interval: float = 1.0) -> Dict[str, Any]:
         """
         轮询等待评估结果
         
         Args:
             output_file: 结果文件路径
-            timeout: 超时时间（秒）
+            timeout_sec: 超时时间（秒）
             poll_interval: 轮询间隔（秒）
             
         Returns:
@@ -256,13 +256,13 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
             elapsed = time.time() - start_time
             
             # 检查是否超时
-            if elapsed >= timeout:
+            if elapsed >= timeout_sec:
                 return {
                     'completed': False,
                     'success': False,
                     'result': None,
                     'metadata': None,
-                    'error': f'评估超时（{timeout}秒）'
+                    'error': f'评估超时（{timeout_sec}秒）'
                 }
             
             # 检查结果
@@ -273,14 +273,14 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
             # 等待后继续轮询
             time.sleep(poll_interval)
 
-    def execute_evaluation(self, ip: str, code: str, timeout: int = 30) -> Dict[str, Any]:
+    def execute_evaluation(self, ip: str, code: str, timeout_sec: int = 30) -> Dict[str, Any]:
         """
         在指定节点执行评估并等待结果
         
         Args:
             ip: 目标节点 IP
             code: 待评估的代码
-            timeout: 超时时间（秒）
+            timeout_sec: 超时时间（秒）
             
         Returns:
             评估结果字典
@@ -312,7 +312,7 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         
         # 等待结果
         output_file = submit_result['output_file']
-        eval_result = self.wait_for_result(output_file, timeout, poll_interval=1.0)
+        eval_result = self.wait_for_result(output_file, timeout_sec, poll_interval=1.0)
         
         # 添加 IP 信息
         eval_result['ip'] = ip
@@ -342,13 +342,13 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         with self._lock:
             self._occupied_ips.discard(ip)
 
-    def execute_evaluation_auto(self, code: str, timeout: int = 30, wait_timeout: Optional[float] = None) -> Dict[str, Any]:
+    def execute_evaluation_auto(self, code: str, timeout_sec: int = 30, wait_timeout: Optional[float] = None) -> Dict[str, Any]:
         """
         自动选择可用 IP 并执行评估，同一时间一个 IP 只能被一个请求占用
         
         Args:
             code: 待评估的代码
-            timeout: 评估超时时间（秒）
+            timeout_sec: 评估超时时间（秒）
             wait_timeout: 等待可用 IP 的超时时间（秒），None 表示无限等待
             
         Returns:
@@ -365,7 +365,7 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
             }
         
         try:
-            result = self.execute_evaluation(ip, code, timeout)
+            result = self.execute_evaluation(ip, code, timeout_sec)
             return result
         finally:
             self._release_ip(ip)

@@ -4,7 +4,7 @@ llm:
   provider: "litellm"
   model: "gemini/gemini-2.5-flash"
   max_tokens: 10000
-  timeout: 6000
+  timeout_sec: 6000
 
 evolution_setting:
   max_iterations: 2

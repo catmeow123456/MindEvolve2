@@ -4,7 +4,7 @@ from api.interface_anthropic import AnthropicConfig, AnthropicLLM
 anthropic_config = {
     "model": "claude-sonnet-4-5-20250929",
     "max_tokens": 10000,
-    "timeout": 600,
+    "timeout_sec": 600,
     "thinking_enabled": True,
     "thinking_budget_tokens": 2000
 }

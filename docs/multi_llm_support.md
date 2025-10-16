@@ -20,7 +20,7 @@ llm:
   temperature: 0.7
   max_tokens: 4096
   reasoning_effort: "high"  # OpenAI o-series 模型特有参数
-  timeout: 60
+  timeout_sec: 60
   retries: 3
   retry_delay: 5
 ```
@@ -42,7 +42,7 @@ llm:
   max_tokens: 4096
   thinking_enabled: true  # Anthropic 特有：启用扩展思考
   thinking_budget_tokens: 1024  # Anthropic 特有：思考令牌预算
-  timeout: 60
+  timeout_sec: 60
   retries: 3
   retry_delay: 5
 ```
@@ -63,7 +63,7 @@ llm:
   model: "gemini/gemini-2.5-flash"  # 可以是任何 LiteLLM 支持的模型
   temperature: 0.7
   max_tokens: 4096
-  timeout: 60
+  timeout_sec: 60
   retries: 3
   retry_delay: 5
   # extra_params:  # 可选：传递给 LiteLLM 的额外参数

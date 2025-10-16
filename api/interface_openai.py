@@ -17,7 +17,7 @@ class OpenAIConfig:
     top_p: Optional[float] = None
     max_tokens: int = 4096
     reasoning_effort: Optional[Literal["minimal", "low", "medium", "high"]] = None  # For OpenAI o-series models
-    timeout: int = 60
+    timeout_sec: int = 60
     retries: int = 3
     retry_delay: int = 5
 
@@ -42,7 +42,7 @@ class OpenAILLM(LLMInterface):
 
     def _generate(self, messages, **kwargs: any):
         begin_time = get_time()
-        print(f"{begin_time} - begin request, timeout={self.config.timeout}")
+        print(f"{begin_time} - begin request, timeout_sec={self.config.timeout_sec}")
         for attempt in range(self.config.retries):
             try:
                 kwargs = {
@@ -56,8 +56,8 @@ class OpenAILLM(LLMInterface):
                     kwargs["max_tokens"] = self.config.max_tokens
                 if self.config.top_p is not None:
                     kwargs["top_p"] = self.config.top_p
-                if self.config.timeout:
-                    kwargs["timeout"] = self.config.timeout
+                if self.config.timeout_sec:
+                    kwargs["timeout"] = self.config.timeout_sec
                 if self.config.model.startswith("o") and self.config.reasoning_effort is not None:
                     kwargs["reasoning_effort"] = self.config.reasoning_effort
                 completion = self.client.chat.completions.create(**kwargs)
@@ -88,7 +88,7 @@ class AsyncOpenAILLM(LLMInterface):
 
     async def _generate(self, messages, **kwargs: any):
         begin_time = get_time()
-        print(f"{begin_time} - begin request, timeout={self.config.timeout}")
+        print(f"{begin_time} - begin request, timeout_sec={self.config.timeout_sec}")
         for attempt in range(self.config.retries):
             try:
                 kwargs = {
@@ -102,8 +102,8 @@ class AsyncOpenAILLM(LLMInterface):
                     kwargs["max_tokens"] = self.config.max_tokens
                 if self.config.top_p is not None:
                     kwargs["top_p"] = self.config.top_p
-                if self.config.timeout:
-                    kwargs["timeout"] = self.config.timeout
+                if self.config.timeout_sec:
+                    kwargs["timeout"] = self.config.timeout_sec
                 if self.config.model.startswith("o") and self.config.reasoning_effort is not None:
                     kwargs["reasoning_effort"] = self.config.reasoning_effort
                 completion = await self.client.chat.completions.create(**kwargs)

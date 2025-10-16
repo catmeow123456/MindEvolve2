@@ -18,7 +18,7 @@ class AnthropicConfig:
     max_tokens: int = 4096
     thinking_enabled: bool = True  # Enable extended thinking
     thinking_budget_tokens: int = 1024  # Budget for thinking tokens
-    timeout: int = 60
+    timeout_sec: int = 60
     retries: int = 3
     retry_delay: int = 5
 
@@ -50,7 +50,7 @@ class AnthropicLLM(LLMInterface):
 
     def _generate(self, messages, **kwargs: any):
         begin_time = get_time()
-        print(f"{begin_time} - begin request, timeout={self.config.timeout}")
+        print(f"{begin_time} - begin request, timeout_sec={self.config.timeout_sec}")
         for attempt in range(self.config.retries):
             try:
                 kwargs = {
@@ -63,8 +63,8 @@ class AnthropicLLM(LLMInterface):
                     kwargs["temperature"] = self.config.temperature
                 if self.config.top_p is not None:
                     kwargs["top_p"] = self.config.top_p
-                if self.config.timeout:
-                    kwargs["timeout"] = self.config.timeout
+                if self.config.timeout_sec:
+                    kwargs["timeout"] = self.config.timeout_sec
                 
                 # Add thinking parameter if enabled
                 if self.config.thinking_enabled:
@@ -108,7 +108,7 @@ class AsyncAnthropicLLM(LLMInterface):
 
     async def _generate(self, messages, **kwargs: any):
         begin_time = get_time()
-        print(f"{begin_time} - begin async request, timeout={self.config.timeout}")
+        print(f"{begin_time} - begin async request, timeout={self.config.timeout_sec}")
         for attempt in range(self.config.retries):
             try:
                 kwargs = {
@@ -121,8 +121,8 @@ class AsyncAnthropicLLM(LLMInterface):
                     kwargs["temperature"] = self.config.temperature
                 if self.config.top_p is not None:
                     kwargs["top_p"] = self.config.top_p
-                if self.config.timeout:
-                    kwargs["timeout"] = self.config.timeout
+                if self.config.timeout_sec:
+                    kwargs["timeout"] = self.config.timeout_sec
                 
                 # Add thinking parameter if enabled
                 if self.config.thinking_enabled:

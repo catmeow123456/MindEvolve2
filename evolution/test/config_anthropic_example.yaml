@@ -7,7 +7,7 @@ llm:
   max_tokens: 4096
   thinking_enabled: true  # Anthropic 特有：启用扩展思考
   thinking_budget_tokens: 1024  # Anthropic 特有：思考令牌预算
-  timeout: 60
+  timeout_sec: 60
   retries: 3
   retry_delay: 5
 

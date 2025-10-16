@@ -74,7 +74,7 @@ with client as manager:
     
     # 测试评估功能
     print("\n测试评估功能...")
-    result = manager.execute_evaluation_auto(test_code, timeout=600)
+    result = manager.execute_evaluation_auto(test_code, timeout_sec=600)
     
     print(f"\n评估结果:")
     print(f"  成功: {result['success']}")

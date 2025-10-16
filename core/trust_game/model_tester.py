@@ -1,6 +1,6 @@
 """
 Model testing functionality for Trust Game
-Tests model execution with timeout and parallel sample processing
+Tests model execution with timeout_sec and parallel sample processing
 """
 import csv
 import random
@@ -11,16 +11,16 @@ from concurrent.futures import ProcessPoolExecutor
 
 
 def _run_policy_with_timeout(model_code: str, state_dict: dict, user_param_dict: dict, 
-                              timeout: float, result_queue: multiprocessing.Queue):
+                              timeout_sec: float, result_queue: multiprocessing.Queue):
     """
-    Helper function to run policy in a separate process with timeout
+    Helper function to run policy in a separate process with timeout_sec
     This runs in a child process
     
     Args:
         model_code: The model code to execute
         state_dict: State dictionary containing round and history
         user_param_dict: User parameter dictionary
-        timeout: Timeout value (not used directly, handled by parent)
+        timeout_sec: Timeout value (not used directly, handled by parent)
         result_queue: Queue for returning results
     """
     try:
@@ -126,7 +126,7 @@ def _test_single_round(model_code: str, state_dict: dict, user_param_dict: dict,
     # Create a queue for inter-process communication
     result_queue = multiprocessing.Queue()
     
-    # Run in separate process with timeout
+    # Run in separate process with timeout_sec
     process = multiprocessing.Process(
         target=_run_policy_with_timeout,
         args=(model_code, state_dict, user_param_dict, timeout_seconds, result_queue)

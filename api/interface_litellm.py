@@ -30,7 +30,7 @@ class LiteLLMConfig:
         temperature: Sampling temperature (0.0 to 2.0)
         top_p: Nucleus sampling parameter
         max_tokens: Maximum tokens to generate
-        timeout: Request timeout in seconds
+        timeout_sec: Request timeout_sec in seconds
         retries: Number of retry attempts on failure
         retry_delay: Delay between retries in seconds
         extra_params: Additional parameters to pass to LiteLLM
@@ -39,7 +39,7 @@ class LiteLLMConfig:
     temperature: Optional[float] = None
     top_p: Optional[float] = None
     max_tokens: int = 4096
-    timeout: int = 60
+    timeout_sec: int = 60
     retries: int = 3
     retry_delay: int = 5
     extra_params: Optional[Dict[str, Any]] = None
@@ -100,7 +100,7 @@ class LiteLLM(LLMInterface):
             LiteLLM completion response
         """
         begin_time = get_time()
-        print(f"{begin_time} - begin request, timeout={self.config.timeout}")
+        print(f"{begin_time} - begin request, timeout_sec={self.config.timeout_sec}")
         
         for attempt in range(self.config.retries):
             try:
@@ -108,7 +108,7 @@ class LiteLLM(LLMInterface):
                 params = {
                     "model": self.config.model,
                     "messages": messages,
-                    "timeout": self.config.timeout,
+                    "timeout": self.config.timeout_sec,
                 }
                 
                 # Add API base and key if provided
@@ -196,7 +196,7 @@ class AsyncLiteLLM(LLMInterface):
             LiteLLM completion response
         """
         begin_time = get_time()
-        print(f"{begin_time} - begin async request, timeout={self.config.timeout}")
+        print(f"{begin_time} - begin async request, timeout_sec={self.config.timeout_sec}")
         
         for attempt in range(self.config.retries):
             try:
@@ -204,7 +204,7 @@ class AsyncLiteLLM(LLMInterface):
                 params = {
                     "model": self.config.model,
                     "messages": messages,
-                    "timeout": self.config.timeout,
+                    "timeout": self.config.timeout_sec,
                 }
                 
                 # Add API base and key if provided

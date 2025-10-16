@@ -4,7 +4,7 @@ llm:    # 进化算法所选用的 llm 类型
   provider: "openai"  # 默认使用 OpenAI 接口
   model: "deepseek-v3-250324"
   max_tokens: 16384
-  timeout: 6000
+  timeout_sec: 6000
 
 evolution_setting:    # 进化算法迭代的参数设置
   max_iterations: 100

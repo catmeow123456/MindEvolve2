@@ -13,7 +13,7 @@ evaluation_config: # 自定义的 evaluation 配置格式
   reviewer_llm:
     model: "claude-sonnet-4-5-20250929"
     max_tokens: 10000
-    timeout: 6000
+    timeout_sec: 6000
     thinking_enabled: true
     thinking_budget_tokens: 1024
   

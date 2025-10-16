@@ -57,7 +57,7 @@ llm:
   provider: openai
   model: "deepseek-v3-250324"
   max_tokens: 16384
-  timeout: 6000
+  timeout_sec: 6000
 
 evolution_setting:
   max_iterations: 100      # 最大迭代代数

@@ -3,11 +3,11 @@ from pathlib import Path
 from typing import Optional
 
 class SSHConnectionManager:
-    def __init__(self, ip_pool: list[str], key_path: str = "~/.ssh/id_rsa", port: int = 22, timeout: int = 10):
+    def __init__(self, ip_pool: list[str], key_path: str = "~/.ssh/id_rsa", port: int = 22, timeout_sec: int = 10):
         self.ip_pool = ip_pool
         self.key_path = Path(key_path).expanduser()
         self.port = port
-        self.timeout = timeout
+        self.timeout_sec = timeout_sec
         self.connections: dict[str, paramiko.SSHClient] = {}
         self.private_key: Optional[paramiko.RSAKey] = None
 
@@ -97,7 +97,7 @@ class SSHConnectionManager:
                 hostname=ip,
                 port=self.port,
                 pkey=self.private_key,
-                timeout=self.timeout,
+                timeout=self.timeout_sec,
                 look_for_keys=False,  # 不自动查找其他密钥
                 allow_agent=False     # 不使用 SSH agent
             )
