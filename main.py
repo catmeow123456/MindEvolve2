@@ -16,8 +16,6 @@ def main():
     parser = argparse.ArgumentParser(description='运行进化算法')
     parser.add_argument('--config', type=str, default='evolution/test/config_test.yaml',
                        help='进化算法配置文件路径 (默认: evolution/test/config_test.yaml)')
-    parser.add_argument('--task-config', type=str, default='core/dictator_game/config.yaml',
-                       help='任务配置文件路径 (默认: core/dictator_game/config.yaml)')
     parser.add_argument('--task-path', type=str, default='core/dictator_game',
                        help='任务路径 (默认: core/dictator_game)')
     parser.add_argument('--output-dir', type=str, default='output/dictator_game',
@@ -33,10 +31,8 @@ def main():
     print(f"\n加载进化算法配置: {args.config}")
     core_config = CoreConfig.from_yaml(args.config)
     
-    print(f"加载任务配置: {args.task_config}")
-    task_config = TaskConfig.from_yaml(args.task_config)
-    
     # 动态导入插件类
+    task_config = TaskConfig.from_yaml(os.path.join(args.task_path, "config.yaml"))
     print(f"初始化任务插件: {task_config.name}")
     module_path = f"core.{task_config.name}.plugin"
     module = importlib.import_module(module_path)

@@ -4,7 +4,7 @@
 以 dictator game 的计算建模任务为例, 运行本框架
 
 ### 1. 准备环境
-提示：框架支持分布式运行来提高性能，此时需要通过鹤思或Slurm调度器来在超算环境中运行。
+提示：框架支持分布式运行来提高性能，此时需要通过鹤思或 Slurm 调度器来在超算环境中运行。
 
 配置免密登录
 ```bash
@@ -32,11 +32,10 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 框架提供了 dictator game 的所有配置、提示词与评估代码，位于 core/dictator_game , 如需执行其他任务，请复制 core/dictator_game 目录并自行修改。
 
 ### 3. 自定义参数
-由于框架迭代运行时间长，建议在 tmux 中运行，避免程序运行中断
+由于框架迭代运行时间长，建议在 tmux 中运行，避免程序运行中断。下面是 dictator_game 和 trust_game 两个任务的例子：
 ```bash
 uv run main.py \
   --config evolution/test/dictatorgame_config_test.yaml \
-  --task-config core/dictator_game/config.yaml \
   --task-path core/dictator_game \
   --output-dir output/dictator_game
 ```
@@ -44,7 +43,6 @@ uv run main.py \
 ## 命令行参数说明
 
 - `--config`: 进化算法配置文件路径（默认: `evolution/test/config.yaml`）
-- `--task-config`: 任务配置文件路径（默认: `core/dictator_game/config.yaml`）
 - `--task-path`: 任务代码路径（默认: `core/dictator_game`）
 - `--output-dir`: 输出目录（默认: `output`）
 
@@ -56,6 +54,7 @@ uv run main.py \
 task_name: "dictator_game"
 
 llm:
+  provider: openai
   model: "deepseek-v3-250324"
   max_tokens: 16384
   timeout: 6000
