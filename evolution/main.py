@@ -94,7 +94,7 @@ class EvolutionEngine:
             creation_method = "initial"
         else:
             print(f"将采样 {program_pool_size} 对 parent 和 inspiration 程序...")
-            samples = program_library.sample_parent_inspiration_pairs(program_pool_size)
+            samples = program_library.sample_parent_inspiration_pairs(program_pool_size, program_pool_size)
             
             prompts = [
                 self.task_plugin.get_mutation_prompt(parent.content, inspiration.content, parent.metadata, inspiration.metadata)
