@@ -41,7 +41,7 @@ class EvolutionEngine:
         elif isinstance(core_config.llm, AnthropicConfig):
             self.llm = AsyncAnthropicLLM(
                 core_config.llm,
-                os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com"),
+                os.getenv("ANTHROPIC_BASE_URL"),
                 os.getenv("ANTHROPIC_API_KEY")
             )
         elif isinstance(core_config.llm, LiteLLMConfig):
@@ -67,14 +67,12 @@ class EvolutionEngine:
 
         hostname_list = os.environ.get('HOSTNAME_LIST', '')
         ip_pool = [ip.strip() for ip in hostname_list.split(';') if ip.strip()]
-        self.evaluator_server_port = os.environ.get('REQUEST_PORT', 9000)
         self.client = RemoteEvaluatorServerManager(
             source_dir = task_plugin.task_path,
             output_dir = os.path.join("tmp", core_config.task_name),
             ip_pool = ip_pool,
             key_path = "~/.ssh/id_rsa",
             port = 22,
-            request_port = self.evaluator_server_port,
             cache = self.evaluator_cache,
             evaluation_config = self.task_plugin.get_evaluation_config()
         )
@@ -111,8 +109,8 @@ class EvolutionEngine:
             tasks = [
                 loop.run_in_executor(
                     executor,
-                    evaluator_client.send_evaluate_request_auto,
-                    code, self.evaluator_server_port, self.core_config.evaluation_timeout
+                    evaluator_client.execute_evaluation_auto,
+                    code, self.core_config.evaluation_timeout
                 )
                 for code in program_list
             ]
