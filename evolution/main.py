@@ -2,7 +2,8 @@ import os
 import re
 import asyncio
 import random
-from typing import Tuple, Optional
+import uuid
+from typing import Tuple, Optional, Union
 from concurrent.futures import ThreadPoolExecutor
 from core.base import TaskPlugin, TaskEvaluator
 from evolution.config import CoreConfig
@@ -12,6 +13,7 @@ from api import (
     AsyncAnthropicLLM, AnthropicConfig,
     AsyncLiteLLM, LiteLLMConfig
 )
+from evolution.agent import ClaudeAgent, ClaudeCodeConfig
 from evolution.program_library import ProgramLibrary, Program
 from evolution.client import RemoteEvaluatorServerManager
 from utils.cache_manager import SimpleCacheManager
@@ -20,7 +22,7 @@ class EvolutionEngine:
     core_config: CoreConfig
     task_plugin: TaskPlugin
     evaluator: TaskEvaluator
-    llm: LLMInterface
+    llm: Union[LLMInterface, ClaudeAgent]
     client: RemoteEvaluatorServerManager
 
     llm_cache: Optional[SimpleCacheManager]
@@ -31,7 +33,7 @@ class EvolutionEngine:
         self.task_plugin = task_plugin
         self.evaluator = task_plugin.create_evaluator()
         
-        # 根据配置类型创建对应的 LLM 实例
+        # 根据配置类型创建对应的 LLM 实例或 ClaudeAgent
         if isinstance(core_config.llm, OpenAIConfig):
             self.llm = AsyncOpenAILLM(
                 core_config.llm,
@@ -50,6 +52,8 @@ class EvolutionEngine:
                 os.getenv("LITELLM_BASE_URL"),  # LiteLLM 可以使用自定义 base_url
                 os.getenv("LITELLM_API_KEY")     # 或从环境变量中读取
             )
+        elif isinstance(core_config.llm, ClaudeCodeConfig):
+            self.llm = ClaudeAgent(core_config.llm)
         else:
             raise ValueError(f"Unsupported LLM config type: {type(core_config.llm)}")
 
@@ -158,16 +162,34 @@ class EvolutionEngine:
         return lib
 
     async def gen_program(self, prompt: str, extra_cache_param: Optional[int] = None) -> str:
+        # 根据 self.llm 类型使用不同的缓存参数
+        if isinstance(self.llm, ClaudeAgent):
+            config_dict = self.llm.config.to_json()
+        else:
+            config_dict = self.llm.config.to_json()
+        
         if self.llm_cache is not None:
-            cache_params = { "llm.config": self.llm.config.to_json(), "prompt": prompt }
+            cache_params = { "llm.config": config_dict, "prompt": prompt }
             if extra_cache_param is not None:
                 cache_params["extra_cache_param"] = extra_cache_param
             cached_response = self.llm_cache.get_cached_response(**cache_params)
             if cached_response:
                 return cached_response
 
-        program_code = await self.llm.generate(prompt)
-        program_code = self.extract_code(program_code)
+        # 根据 self.llm 类型调用不同的生成方法
+        if isinstance(self.llm, ClaudeAgent):
+            # 使用 ClaudeAgent
+            task_uid = str(uuid.uuid4())[:8]  # 生成短的唯一标识符
+            program_code = await self.llm.run(
+                prompt=prompt,
+                task_uid=task_uid,
+                target_file="program.py"
+            )
+            # ClaudeAgent 已经返回纯代码，不需要额外提取
+        else:
+            # 使用传统 LLMInterface
+            program_code = await self.llm.generate(prompt)
+            program_code = self.extract_code(program_code)
 
         if self.llm_cache:
             self.llm_cache.cache_response(response=program_code, **cache_params)

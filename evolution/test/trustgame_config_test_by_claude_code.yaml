@@ -1,0 +1,22 @@
+task_name: "trust_game"
+
+llm:
+  provider: "claude_code"
+  model: "claude-sonnet-4-20250514"
+  system_prompt: "You are an expert Python programmer."
+  permission_mode: "acceptEdits"
+  max_turns: 15
+  allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+  agent_dir: ".claude_code"
+  retries: 3
+
+evolution_setting:
+  max_iterations: 2
+  program_pool_size: 4
+
+cache:
+  enabled: true
+  cache_dir: "__cache__"
+
+evaluation_timeout: 120000   # 完整的单次评估的最大时间
+seed: 12345

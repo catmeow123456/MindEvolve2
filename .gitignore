@@ -13,6 +13,8 @@ wheels/
 .env
 output/
 tmp/
+.claude_code/
+.claude_code_examples/
 
 # Cache Files
-__cache__
+__cache__/

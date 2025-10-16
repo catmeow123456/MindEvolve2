@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from api import OpenAIConfig, AnthropicConfig, LiteLLMConfig
+from evolution.agent import ClaudeCodeConfig
 from core.base import TaskEvaluator
 from pathlib import Path
 from typing import Union, Optional
@@ -21,7 +22,7 @@ class CacheConfig:
 class CoreConfig:
     output_dir: str = "output"
     task_name: str = "default"
-    llm: Union[OpenAIConfig, AnthropicConfig, LiteLLMConfig] = field(default_factory=OpenAIConfig)
+    llm: Union[OpenAIConfig, AnthropicConfig, LiteLLMConfig, ClaudeCodeConfig] = field(default_factory=OpenAIConfig)
     evolution_setting: EvolutionSettingConfig = field(default_factory=EvolutionSettingConfig)
     cache: CacheConfig = field(default_factory=CacheConfig)
     evaluation_timeout: int = 1000
@@ -44,8 +45,10 @@ class CoreConfig:
                 config_dict["llm"] = from_dict(data_class=AnthropicConfig, data=llm_config, config=Config(strict=True, check_types=True))
             elif provider == "litellm":
                 config_dict["llm"] = from_dict(data_class=LiteLLMConfig, data=llm_config, config=Config(strict=True, check_types=True))
+            elif provider == "claude_code":
+                config_dict["llm"] = from_dict(data_class=ClaudeCodeConfig, data=llm_config, config=Config(strict=True, check_types=True))
             else:
-                raise ValueError(f"Unsupported LLM provider: {provider}. Supported providers: openai, anthropic, litellm")
+                raise ValueError(f"Unsupported LLM provider: {provider}. Supported providers: openai, anthropic, litellm, claude_code")
         
         # 使用 dacite 处理其他字段
         return from_dict(data_class=cls, data=config_dict, config=Config(strict=True, check_types=True))

@@ -1,0 +1,23 @@
+task_name: "claude_code_test"
+output_dir: "output"
+
+llm:
+  provider: "claude_code"
+  model: "claude-sonnet-4-20250514"
+  system_prompt: "You are an expert Python programmer."
+  permission_mode: "acceptEdits"
+  max_turns: 15
+  allowed_tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
+  agent_dir: ".claude_code"
+  retries: 3
+
+evolution_setting:
+  max_iterations: 100
+  program_pool_size: 10
+
+cache:
+  enabled: false
+  cache_dir: null
+
+evaluation_timeout: 1000
+seed: null
