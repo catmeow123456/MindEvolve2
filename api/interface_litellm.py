@@ -8,9 +8,11 @@ from typing import Optional, Any, Dict, override
 from dataclasses import dataclass, asdict
 import datetime
 
+# import litellm
 from litellm import completion, acompletion
 from api.base import LLMInterface
 
+# litellm._turn_on_debug()
 
 def get_time() -> str:
     return datetime.datetime.fromtimestamp(time.time()).strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -69,7 +71,7 @@ class LiteLLM(LLMInterface):
         if self.api_base.endswith('/'):
             self.api_base = self.api_base[:-1]
         if 'gemini' in self.config.model:
-            if not self.api_base.endswith("/v1beta"):
+            if not self.api_base.endswith("/v1beta") and not self.api_base.endswith("/google"):
                 self.api_base = self.api_base + '/v1beta'
         elif 'claude' not in self.config.model:
             if not self.api_base.endswith("/v1"):
@@ -88,14 +90,7 @@ class LiteLLM(LLMInterface):
         """
         message_list = [{"role": "user", "content": prompt}]
         response = self._generate(messages=message_list, **kwargs)
-        
-        # Extract content from response
-        if hasattr(response, 'choices') and len(response.choices) > 0:
-            message = response.choices[0].message
-            if hasattr(message, 'content') and message.content:
-                return message.content
-        
-        raise ValueError("The generation result is empty, and no valid content can be obtained.")
+        return response.choices[0].message.content
 
     def _generate(self, messages: list, **kwargs: Any):
         """Internal method to call LiteLLM completion
@@ -142,6 +137,15 @@ class LiteLLM(LLMInterface):
                 
                 # Call LiteLLM completion
                 response = completion(**params)
+                
+                # Validate response content
+                if not (hasattr(response, 'choices') and len(response.choices) > 0):
+                    raise ValueError("The generation result is empty, and no valid content can be obtained.")
+                
+                message = response.choices[0].message
+                if not (hasattr(message, 'content') and message.content):
+                    raise ValueError("The generation result is empty, and no valid content can be obtained.")
+                
                 return response
                 
             except Exception as e:
@@ -193,14 +197,7 @@ class AsyncLiteLLM(LLMInterface):
         """
         message_list = [{"role": "user", "content": prompt}]
         response = await self._generate(messages=message_list, **kwargs)
-        # DEBUG: print(response)
-        # Extract content from response
-        if hasattr(response, 'choices') and len(response.choices) > 0:
-            message = response.choices[0].message
-            if hasattr(message, 'content') and message.content:
-                return message.content
-        
-        raise ValueError("The generation result is empty, and no valid content can be obtained.")
+        return response.choices[0].message.content
 
     async def _generate(self, messages: list, **kwargs: Any):
         """Internal method to call LiteLLM async completion
@@ -247,6 +244,15 @@ class AsyncLiteLLM(LLMInterface):
                 
                 # Call LiteLLM async completion
                 response = await acompletion(**params)
+                
+                # Validate response content
+                if not (hasattr(response, 'choices') and len(response.choices) > 0):
+                    raise ValueError("The generation result is empty, and no valid content can be obtained.")
+                
+                message = response.choices[0].message
+                if not (hasattr(message, 'content') and message.content):
+                    raise ValueError("The generation result is empty, and no valid content can be obtained.")
+                
                 return response
                 
             except Exception as e:

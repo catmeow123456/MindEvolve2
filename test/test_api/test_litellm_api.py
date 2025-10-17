@@ -24,7 +24,7 @@ def test_litellm_openai():
     
     llm = LiteLLM(
         model_config=config,
-        api_base=LITELLM_BASE_URL + "/v1",
+        api_base=LITELLM_BASE_URL,
         api_key=LITELLM_API_KEY
     )
     response = llm.generate("Hello, how are you?")
@@ -68,7 +68,7 @@ def test_litellm_gemini():
     
     llm = LiteLLM(
         model_config=config,
-        api_base=LITELLM_BASE_URL + "/v1beta",
+        api_base=LITELLM_BASE_URL,
         api_key=LITELLM_API_KEY
     )
     response = llm.generate("Hello, how are you?")
@@ -87,7 +87,7 @@ async def test_async_litellm():
     
     llm = AsyncLiteLLM(
         model_config=config,
-        api_base=LITELLM_BASE_URL + "/v1",
+        api_base=LITELLM_BASE_URL,
         api_key=LITELLM_API_KEY
     )
     response = await llm.generate("Hello, how are you?")

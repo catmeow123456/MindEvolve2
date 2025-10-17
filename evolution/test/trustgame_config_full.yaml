@@ -8,7 +8,7 @@ llm:
 
 evolution_setting:
   max_iterations: 10
-  program_pool_size: 1
+  program_pool_size: 20
 
 cache:
   enabled: true
