@@ -18,4 +18,4 @@ cache:
   enabled: true
   cache_dir: "__cache__"
 
-evaluation_timeout: 12000
+evaluation_timeout_sec: 12000

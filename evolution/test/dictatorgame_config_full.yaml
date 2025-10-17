@@ -14,4 +14,4 @@ cache:
   enabled: true
   cache_dir: "__cache__"
 
-evaluation_timeout: 12000   # 完整的单次评估的最大时间
+evaluation_timeout_sec: 12000   # 完整的单次评估的最大时间

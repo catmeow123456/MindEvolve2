@@ -8,13 +8,11 @@
             "program": "${workspaceFolder}/main.py",
             "args": [
                 "--config",
-                "evolution/test/trustgame_config_test.yaml",
-                "--task-config",
-                "core/trust_game/config.yaml",
+                "evolution/test/trustgame_config_full.yaml",
                 "--task-path",
                 "core/trust_game/",
                 "--output-dir",
-                "output/trust_game_2th"
+                "output/trust_game"
             ],
             "console": "integratedTerminal",
             "envFile": "${workspaceFolder}/.env",

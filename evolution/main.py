@@ -114,7 +114,7 @@ class EvolutionEngine:
                 loop.run_in_executor(
                     executor,
                     evaluator_client.execute_evaluation_auto,
-                    code, self.core_config.evaluation_timeout
+                    code, self.core_config.evaluation_timeout_sec
                 )
                 for code in program_list
             ]

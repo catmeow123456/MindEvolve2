@@ -61,9 +61,9 @@ def test_litellm_anthropic():
 def test_litellm_gemini():
     """Test LiteLLM with Gemini model"""
     config = LiteLLMConfig(
-        model="gemini/gemini-2.5-flash",
-        temperature=0.7,
-        max_tokens=100
+        model="gemini/gemini-2.5-pro",
+        max_tokens=10000,
+        timeout_sec=6000
     )
     
     llm = LiteLLM(

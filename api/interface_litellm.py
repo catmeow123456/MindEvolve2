@@ -52,20 +52,28 @@ class LiteLLM(LLMInterface):
     """Synchronous LiteLLM interface"""
     
     config: LiteLLMConfig
-    api_base: Optional[str]
-    api_key: Optional[str]
+    api_base: str
+    api_key: str
 
-    def __init__(self, model_config: LiteLLMConfig, api_base: Optional[str] = None, api_key: Optional[str] = None):
+    def __init__(self, model_config: LiteLLMConfig, api_base: str, api_key: str):
         """Initialize LiteLLM interface
         
         Args:
             model_config: Model configuration
-            api_base: Custom API base URL (optional, overrides environment variables)
-            api_key: API key (optional, overrides environment variables)
+            api_base: Custom API base URL
+            api_key: API key
         """
         self.config = model_config
         self.api_base = api_base
         self.api_key = api_key
+        if self.api_base.endswith('/'):
+            self.api_base = self.api_base[:-1]
+        if 'gemini' in self.config.model:
+            if not self.api_base.endswith("/v1beta"):
+                self.api_base = self.api_base + '/v1beta'
+        elif 'claude' not in self.config.model:
+            if not self.api_base.endswith("/v1"):
+                self.api_base = self.api_base + '/v1'
 
     @override
     def generate(self, prompt: str, **kwargs: Any) -> str:
@@ -162,6 +170,15 @@ class AsyncLiteLLM(LLMInterface):
         self.config = model_config
         self.api_base = api_base
         self.api_key = api_key
+
+        if self.api_base.endswith('/'):
+            self.api_base = self.api_base[:-1]
+        if 'gemini' in self.config.model:
+            if not self.api_base.endswith("/v1beta"):
+                self.api_base = self.api_base + '/v1beta'
+        elif 'claude' not in self.config.model:
+            if not self.api_base.endswith("/v1"):
+                self.api_base = self.api_base + '/v1'
 
     @override
     async def generate(self, prompt: str, **kwargs: Any) -> str:

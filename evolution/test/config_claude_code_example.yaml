@@ -19,5 +19,5 @@ cache:
   enabled: false
   cache_dir: null
 
-evaluation_timeout: 1000
+evaluation_timeout_sec: 1000
 seed: null

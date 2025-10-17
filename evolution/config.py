@@ -25,7 +25,7 @@ class CoreConfig:
     llm: Union[OpenAIConfig, AnthropicConfig, LiteLLMConfig, ClaudeCodeConfig] = field(default_factory=OpenAIConfig)
     evolution_setting: EvolutionSettingConfig = field(default_factory=EvolutionSettingConfig)
     cache: CacheConfig = field(default_factory=CacheConfig)
-    evaluation_timeout: int = 1000
+    evaluation_timeout_sec: int = 1000
     seed: Optional[int] = None
 
     @classmethod
