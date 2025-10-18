@@ -1,0 +1,24 @@
+Please extract and standardize the scores from the following code quality review.
+
+Original review:
+---
+{review}
+---
+
+You must output EXACTLY in this format (preserve the exact structure and brackets):
+
+### Dimension Scores:
+1. Code Clarity and Readability: [XX]
+2. Correctness and Robustness: [XX]
+3. Computational Efficiency: [XX]
+4. Code Organization and Modularity: [XX]
+5. Best Practices Compliance: [XX]
+6. Documentation Quality: [XX]
+7. Overall Code Quality Score: [XX]
+
+Where XX is a number from 0 to 100 for each dimension.
+
+CRITICAL RULES:
+- Each score must be in format [XX] where XX is between 0 and 100
+- Do not add any other text, explanations, or formatting
+- If a score is unclear in the original review, use: [0]

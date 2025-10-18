@@ -23,9 +23,12 @@ class TrustGameEvaluator(TaskEvaluator):
         # Load prompt templates
         prompt_review_1 = open(data_files['prompt_review_1'], 'r', encoding='utf-8').read()
         prompt_review_2 = open(data_files['prompt_review_2'], 'r', encoding='utf-8').read()
+        prompt_standardize_theoretical = open(data_files['prompt_standardize_theoretical'], 'r', encoding='utf-8').read()
+        prompt_standardize_code = open(data_files['prompt_standardize_code'], 'r', encoding='utf-8').read()
         
         # Initialize reviewers
-        self.reviewers = ModelReviewers(config, prompt_review_1, prompt_review_2)
+        self.reviewers = ModelReviewers(config, prompt_review_1, prompt_review_2,
+                                       prompt_standardize_theoretical, prompt_standardize_code)
         
         if not os.path.exists(self.game_data):
             raise ValueError(f"Data file {self.game_data} not found")
@@ -52,20 +55,28 @@ class TrustGameEvaluator(TaskEvaluator):
             with open(code_path, 'w', encoding='utf-8') as f:
                 f.write(model_code)
             
-            # Get reviews from both reviewers in parallel
+            # Get reviews from both reviewers in parallel and standardize them
             print("开始并行评审模型...")
-            review_1, review_2 = self.reviewers.review_parallel(model_code)
+            review_1, review_2, standardized_1, standardized_2 = self.reviewers.review_and_standardize_parallel(model_code)
             print("评审完成")
             
-            # Save reviews for debugging
+            # Save original reviews for debugging
             with open(review_1_path, 'w', encoding='utf-8') as f:
                 f.write(review_1)
             with open(review_2_path, 'w', encoding='utf-8') as f:
                 f.write(review_2)
             
-            # Extract scores from reviews
-            reviewer_1_scores = extract_scores_from_theoretical_review(review_1)
-            reviewer_2_scores = extract_scores_from_code_review(review_2)
+            # Save standardized reviews for debugging
+            standardized_1_path = f"model_{suffix}_review1_standardized.md"
+            standardized_2_path = f"model_{suffix}_review2_standardized.md"
+            with open(standardized_1_path, 'w', encoding='utf-8') as f:
+                f.write(standardized_1)
+            with open(standardized_2_path, 'w', encoding='utf-8') as f:
+                f.write(standardized_2)
+            
+            # Extract scores from standardized reviews
+            reviewer_1_scores = extract_scores_from_theoretical_review(standardized_1)
+            reviewer_2_scores = extract_scores_from_code_review(standardized_2)
             
             # Test model runs successfully (with parallel sample testing)
             print("测试模型是否能成功运行（并行测试）...")
@@ -83,7 +94,6 @@ class TrustGameEvaluator(TaskEvaluator):
             metrics = {
                 "reviewer_1_overall": reviewer_1_scores.get("overall", 0.0),
                 "reviewer_2_overall": reviewer_2_scores.get("overall", 0.0),
-                "combined_score": (reviewer_1_scores.get("overall", 0.0) + reviewer_2_scores.get("overall", 0.0)) / 2.0,
                 "runs_successfully": runs_successfully_score,
             }
             
@@ -91,19 +101,25 @@ class TrustGameEvaluator(TaskEvaluator):
             metadata = {
                 "reviewer_1_comment": review_1,
                 "reviewer_2_comment": review_2,
+                "reviewer_1_standardized": standardized_1,
+                "reviewer_2_standardized": standardized_2,
                 "reviewer_1_scores": reviewer_1_scores,
                 "reviewer_2_scores": reviewer_2_scores,
                 "runs_successfully_metadata": runs_metadata,
                 "saved_files": {
                     "code": code_path,
                     "review_1": review_1_path,
-                    "review_2": review_2_path
+                    "review_2": review_2_path,
+                    "review_1_standardized": standardized_1_path,
+                    "review_2_standardized": standardized_2_path
                 }
             }
             
             print(f"已保存模型代码到: {code_path}")
             print(f"已保存理论评估到: {review_1_path}")
             print(f"已保存代码质量评估到: {review_2_path}")
+            print(f"已保存标准化理论评估到: {standardized_1_path}")
+            print(f"已保存标准化代码质量评估到: {standardized_2_path}")
             
             return metrics, metadata
             

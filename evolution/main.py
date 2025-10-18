@@ -188,14 +188,20 @@ class EvolutionEngine:
             # ClaudeAgent 已经返回纯代码，不需要额外提取
         else:
             # 使用传统 LLMInterface
-            program_code = await self.llm.generate(prompt)
-            program_code = self.extract_code(program_code)
+            original_code = await self.llm.generate(prompt)
+            program_code = EvolutionEngine.extract_code(original_code)
+            if "```" in program_code:
+                print("Warning! extract failed.")
+                with open("debug.log", "w") as f:
+                    f.write(original_code)
+                raise
 
         if self.llm_cache:
             self.llm_cache.cache_response(response=program_code, **cache_params)
         return program_code
 
-    def extract_code(self, text: str) -> str:
+    @staticmethod
+    def extract_code(text: str) -> str:
         """Extract code from LLM output"""
         pattern = r'```(?:python)?\n(.*?)```'
         matches = re.findall(pattern, text, re.DOTALL)

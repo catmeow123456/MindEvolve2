@@ -96,10 +96,9 @@ class TrustGameEvaluator(TaskEvaluator):
             
             # Combine metrics
             metrics = {
+                "runs_successfully": runs_successfully_score,
                 "reviewer_1_overall": reviewer_1_scores.get("overall", 0.0),
                 "reviewer_2_overall": reviewer_2_scores.get("overall", 0.0),
-                "combined_score": (reviewer_1_scores.get("overall", 0.0) + reviewer_2_scores.get("overall", 0.0)) / 2.0,
-                "runs_successfully": runs_successfully_score,
                 "bic_score": bic_score
             }
             
@@ -128,11 +127,11 @@ class TrustGameEvaluator(TaskEvaluator):
             print(f"评估失败: {e}")
             metadata = {"error": repr(e)}
             return {
+                "runs_successfully": 0.0,
                 "reviewer_1_overall": 0.0,
                 "reviewer_2_overall": 0.0,
+                "bic_score": 0.0,
                 "combined_score": 0.0,
-                "runs_successfully": 0.0,
-                "bic_score": 0.0
             }, metadata
 
     def get_metric_names(self) -> list[str]:
