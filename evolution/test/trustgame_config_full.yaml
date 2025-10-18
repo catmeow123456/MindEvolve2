@@ -3,7 +3,7 @@ task_name: "trust_game"
 llm:
   provider: "litellm"
   model: "gemini/gemini-2.5-pro"
-  max_tokens: 10000
+  max_tokens: 60000
   timeout_sec: 600
 
 evolution_setting:

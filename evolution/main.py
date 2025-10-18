@@ -202,11 +202,45 @@ class EvolutionEngine:
 
     @staticmethod
     def extract_code(text: str) -> str:
-        """Extract code from LLM output"""
-        pattern = r'```(?:python)?\n(.*?)```'
-        matches = re.findall(pattern, text, re.DOTALL)
+        """
+        增强的代码提取函数，处理各种异常格式
+        支持的情况：
+        1. 标准格式: ```python\ncode\n```
+        2. 只有结尾: code```
+        3. 只有开头: ```python\ncode
+        4. 无标记: 直接返回原文本
+        """
+        # 策略1: 尝试匹配标准的完整代码块（开头+结尾）
+        # 支持 ```python、```py、``` 等多种形式，换行符可选
+        pattern_complete = r'```(?:python|py)?\s*\n?(.*?)```'
+        matches = re.findall(pattern_complete, text, re.DOTALL)
         
         if matches:
-            return '\n'.join(match.strip() for match in matches)
-        else:
-            return text
+            # 找到完整的代码块，提取并合并
+            code = '\n'.join(match.strip() for match in matches)
+            return code
+        
+        # 策略2: 检查是否只有结尾标记（text中有```但没有匹配到完整块）
+        if '```' in text:
+            # 尝试匹配只有结尾的情况：从开头到第一个```
+            pattern_only_end = r'^(.*?)```'
+            match_end = re.search(pattern_only_end, text, re.DOTALL)
+            if match_end:
+                code = match_end.group(1).strip()
+                # 清理可能的开头标记残留
+                code = re.sub(r'^```(?:python|py)?\s*\n?', '', code)
+                if code:  # 确保提取到的不是空字符串
+                    return code
+            
+            # 策略3: 尝试匹配只有开头的情况：从```开头到文本结尾
+            pattern_only_start = r'```(?:python|py)?\s*\n?(.*?)$'
+            match_start = re.search(pattern_only_start, text, re.DOTALL)
+            if match_start:
+                code = match_start.group(1).strip()
+                # 清理可能的结尾标记残留
+                code = re.sub(r'```\s*$', '', code)
+                if code:  # 确保提取到的不是空字符串
+                    return code
+        
+        # 策略4: 如果都没有匹配，返回原文本（清理首尾空白）
+        return text.strip()

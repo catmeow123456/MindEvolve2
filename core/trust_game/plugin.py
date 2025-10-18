@@ -35,20 +35,13 @@ class TrustGamePlugin(TaskPlugin):
                 parent_review_2 = parent_review_1
         
         prompt = (
+            f"{self.get_mission_description()}\n"
             "You are provided with a PARENT program (with detailed expert reviews) and an INSPIRATION program. "
             "The parent has been evaluated by two expert reviewers:\n"
             "- Reviewer 1 (Theoretical): Evaluates cognitive science and behavioral economics aspects\n"
             "- Reviewer 2 (Code Quality): Evaluates implementation quality and best practices\n\n"
             "Your task is to generate a NEW program that meaningfully improves upon the parent by addressing the identified weaknesses "
             "while incorporating successful mechanisms from the inspiration program.\n\n"
-            "## CRITICAL REQUIREMENTS:\n"
-            "1. The policy function MUST return exactly 5 probabilities: [p(invest 0), p(invest 5), p(invest 10), p(invest 15), p(invest 20)]\n"
-            "2. The probabilities MUST sum to 1.0 (valid probability distribution)\n"
-            "3. You MUST use the softmax formula with max subtraction: exp(utility - max(utilities)) to prevent overflow\n"
-            "4. Handle edge cases (e.g., first round with no history)\n"
-            "5. All required UserParameter fields must be used meaningfully in the model\n"
-            "6. Implement proper Theory of Mind (recursive reasoning, not just historical averaging)\n"
-            "7. Implement proper Planning (dynamic programming/Bellman equations, not just additive terms)\n\n"
             "## PARENT PROGRAM:\n"
             "```python\n"
             f"{parent}\n"
@@ -76,6 +69,7 @@ class TrustGamePlugin(TaskPlugin):
             "```\n\n"
             "Return ONLY the complete Python code with the policy function fully implemented. "
             "Do not include markdown code fences in your response, just the raw Python code."
+            "Code must be enclosed with ```python and ```"
         )
         
         return prompt
