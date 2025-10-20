@@ -13,7 +13,7 @@ print(f"IP 池: {ip_pool}")
 
 client = RemoteEvaluatorServerManager(
     source_dir="core/dictator_game",
-    output_dir="output",
+    output_dir="tmp/test_client",
     ip_pool=ip_pool,
     key_path="~/.ssh/id_rsa",
 )

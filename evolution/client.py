@@ -82,16 +82,18 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         session_name: str, 
         command: str, 
         working_dir: str = None,
-        log_file: str = None
+        log_file: str = None,
+        ip: Optional[str] = None
     ) -> dict[str, tuple]:
         """
-        在所有主机上使用 tmux 启动后台程序
+        在指定主机或所有主机上使用 tmux 启动后台程序
         
         Args:
             session_name: tmux 会话名称
             command: 要执行的命令
             working_dir: 工作目录（可选）
             log_file: 日志文件路径（可选）
+            ip: 目标主机 IP（可选），如果指定则只在该主机执行，否则在所有主机执行
             
         Returns:
             执行结果字典
@@ -121,7 +123,12 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
 
         full_command = " && ".join(cmd_parts)
 
-        return self.execute_on_all(full_command)
+        # 根据是否指定 ip 来选择执行方式
+        if ip:
+            stdout, stderr, exit_code = self.execute_command(ip, full_command)
+            return {ip: (stdout, stderr, exit_code)}
+        else:
+            return self.execute_on_all(full_command)
     
     def check_tmux_session(self, session_name: str) -> dict[str, bool]:
         """检查 tmux 会话是否存在"""
@@ -150,59 +157,6 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         """终止指定的 tmux 会话"""
         command = f"tmux kill-session -t {session_name}"
         return self.execute_on_all(command)
-
-    def execute_evaluation_async(self, ip: str, code: str, task_id: str) -> Dict[str, Any]:
-        """
-        在指定节点异步提交评估任务
-        
-        Args:
-            ip: 目标节点 IP
-            code: 待评估的代码
-            task_id: 任务 ID
-            
-        Returns:
-            包含任务信息的字典
-        """
-        result = {'success': False, 'error': None, 'task_id': task_id, 'ip': ip}
-        
-        try:
-            # 定义文件路径
-            target_dir_abs = os.path.abspath(self.target_dir)
-            tasks_dir = os.path.join(target_dir_abs, "tasks")
-            code_file = os.path.join(tasks_dir, f"{task_id}_code.py")
-            output_file = os.path.join(tasks_dir, f"{task_id}_result.json")
-            
-            # 写入代码文件到本地
-            Path(code_file).write_text(code, encoding='utf-8')
-            
-            # 构建评估命令
-            eval_command = f"uv run evaluator_worker.py --code-file {code_file} --output-file {output_file}"
-            
-            # 在 tmux 会话中执行
-            session_name = f"eval-{task_id}"
-            tmux_results = self.start_tmux_session(
-                session_name=session_name,
-                command=eval_command,
-                working_dir=target_dir_abs
-            )
-            
-            # 检查是否成功启动
-            if ip in tmux_results:
-                stdout, stderr, exit_code = tmux_results[ip]
-                if exit_code == 0:
-                    result['success'] = True
-                    result['code_file'] = code_file
-                    result['output_file'] = output_file
-                    result['session_name'] = session_name
-                else:
-                    result['error'] = f"tmux 启动失败: exit_code={exit_code}, stderr={stderr}"
-            else:
-                result['error'] = f"节点 {ip} 未返回结果"
-                
-        except Exception as e:
-            result['error'] = f"提交任务异常: {str(e)}"
-            
-        return result
 
     def check_evaluation_result(self, output_file: str) -> Dict[str, Any]:
         """
@@ -295,33 +249,77 @@ class RemoteEvaluatorServerManager(SSHConnectionManager):
         # 生成任务 ID
         task_id = str(uuid.uuid4())
         
-        # 提交任务
-        submit_result = self.execute_evaluation_async(ip, code, task_id)
+        # 定义文件路径
+        target_dir_abs = os.path.abspath(self.target_dir)
+        tasks_dir = os.path.join(target_dir_abs, "tasks")
+        code_file = os.path.join(tasks_dir, f"{task_id}_code.py")
+        output_file = os.path.join(tasks_dir, f"{task_id}_result.json")
         
-        if not submit_result['success']:
+        try:
+            # 写入代码文件到本地
+            Path(code_file).write_text(code, encoding='utf-8')
+            
+            # 构建评估命令
+            eval_command = f"uv run evaluator_worker.py --code-file {code_file} --output-file {output_file}"
+            
+            # 在 tmux 会话中执行（指定 ip）
+            session_name = f"eval-{task_id}"
+            tmux_results = self.start_tmux_session(
+                session_name=session_name,
+                command=eval_command,
+                working_dir=target_dir_abs,
+                ip=ip
+            )
+            
+            # 检查是否成功启动
+            if ip not in tmux_results:
+                result = {
+                    'success': False,
+                    'result': None,
+                    'metadata': None,
+                    'error': f"节点 {ip} 未返回结果",
+                    'ip': ip
+                }
+                if self.cache is not None:
+                    self.cache.cache_response(response=json.dumps(result), **cache_params)
+                return result
+            
+            stdout, stderr, exit_code = tmux_results[ip]
+            if exit_code != 0:
+                result = {
+                    'success': False,
+                    'result': None,
+                    'metadata': None,
+                    'error': f"tmux 启动失败: exit_code={exit_code}, stderr={stderr}",
+                    'ip': ip
+                }
+                if self.cache is not None:
+                    self.cache.cache_response(response=json.dumps(result), **cache_params)
+                return result
+            
+            # 等待结果
+            eval_result = self.wait_for_result(output_file, timeout_sec, poll_interval=1.0)
+            
+            # 添加 IP 信息
+            eval_result['ip'] = ip
+            
+            # 缓存结果
+            if self.cache is not None and eval_result['completed']:
+                self.cache.cache_response(response=json.dumps(eval_result), **cache_params)
+            
+            return eval_result
+            
+        except Exception as e:
             result = {
                 'success': False,
                 'result': None,
                 'metadata': None,
-                'error': submit_result['error'],
+                'error': f"提交任务异常: {str(e)}",
                 'ip': ip
             }
             if self.cache is not None:
                 self.cache.cache_response(response=json.dumps(result), **cache_params)
             return result
-        
-        # 等待结果
-        output_file = submit_result['output_file']
-        eval_result = self.wait_for_result(output_file, timeout_sec, poll_interval=1.0)
-        
-        # 添加 IP 信息
-        eval_result['ip'] = ip
-        
-        # 缓存结果
-        if self.cache is not None and eval_result['completed']:
-            self.cache.cache_response(response=json.dumps(eval_result), **cache_params)
-        
-        return eval_result
 
     def acquire_ip(self, wait_timeout: Optional[float] = None) -> Optional[str]:
         """获取可用 IP，每个 IP 同一时间只能被一个请求占用"""
