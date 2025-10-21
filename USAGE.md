@@ -28,6 +28,8 @@ vi .env
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
+claude 版本： 2.0.19
+
 ### 2. 编写任务的配置、提示词与评估代码
 框架提供了 dictator game 的所有配置、提示词与评估代码，位于 core/dictator_game , 如需执行其他任务，请复制 core/dictator_game 目录并自行修改。
 

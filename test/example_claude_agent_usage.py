@@ -60,7 +60,7 @@ async def example_data_processing():
     print("=" * 60)
     
     config = ClaudeCodeConfig(
-        model="claude-sonnet-4-20250514",
+        model="claude-sonnet-4-5-20250929",
         system_prompt="You are an expert Python data scientist.",
         permission_mode="acceptEdits",
         max_turns=10,

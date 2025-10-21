@@ -2,6 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Claude Code test File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/test/example_claude_agent_usage.py",
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/.env",
+            "env": {
+                "DEBUG_MODE": "TRUE"
+            },
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "Python Debugger: Direct main.py (without uv)",
             "type": "debugpy",
             "request": "launch",
